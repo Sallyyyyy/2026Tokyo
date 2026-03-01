@@ -2,352 +2,195 @@
 <html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>東京櫻花 2026 Pro v6.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>東京櫻花 2026 Pro v7.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-      :root {
-        --main-pink: #ffb6c1;
-        --bg-pink: #fff5f7;
-      }
-      body {
-        background-color: var(--bg-pink);
-        font-family: -apple-system, sans-serif;
-        padding-bottom: 120px;
-        color: #4a4a4a;
-      }
-      .card {
-        background: white;
-        border-radius: 18px;
-        padding: 18px;
-        border-left: 8px solid #ddd;
-        box-shadow: 0 4px 12px rgba(255, 182, 193, 0.1);
-        cursor: pointer;
-        position: relative;
-      }
+      :root { --main-pink: #ffb6c1; --bg-pink: #fff5f7; }
+      body { background-color: var(--bg-pink); font-family: -apple-system, sans-serif; padding-bottom: 100px; color: #4a4a4a; -webkit-tap-highlight-color: transparent; }
+      
+      .day-nav { display: flex; overflow-x: auto; gap: 10px; padding: 10px 5px; scrollbar-width: none; }
+      .day-nav::-webkit-scrollbar { display: none; }
+      .day-tab { flex: 0 0 70px; text-align: center; padding: 10px; border-radius: 15px; background: white; border: 2px solid transparent; transition: 0.3s; }
+      .day-tab.active { border-color: var(--main-pink); background: #ffe4e8; transform: scale(1.05); }
+
+      .card { background: white; border-radius: 18px; padding: 16px; border-left: 8px solid #ddd; box-shadow: 0 4px 12px rgba(255, 182, 193, 0.1); margin-bottom: 15px; position: relative; }
       .card-spot { border-left-color: var(--main-pink); }
       .card-restaurant { border-left-color: #ff9800; }
       .card-transport { border-left-color: #9ca3af; }
       
-      .personal-note-preview {
-        background: #f0f7ff;
-        color: #1e40af;
-        padding: 6px 10px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        margin-top: 8px;
-        border-left: 3px solid #3b82f6;
-        font-style: italic;
-      }
-      .popup-bg {
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        align-items: end;
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-      }
+      .budget-badge { background: #e0f2f1; color: #00796b; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+      
+      .popup-bg { background: rgba(0, 0, 0, 0.7); display: none; align-items: end; position: fixed; inset: 0; z-index: 1000; }
       .popup-bg.active { display: flex; }
-      .popup-content {
-        transform: translateY(100%);
-        transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1);
-        background: white;
-        width: 100%;
-        border-radius: 30px 30px 0 0;
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-      }
+      .popup-content { transform: translateY(100%); transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); background: white; width: 100%; border-radius: 30px 30px 0 0; max-height: 85vh; overflow-y: auto; }
       .popup-bg.active .popup-content { transform: translateY(0); }
-      .popup-header-img {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        border-radius: 30px 30px 0 0;
-        background-color: #e5e7eb;
-      }
-      .img-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 220px;
-        background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.7));
-        border-radius: 30px 30px 0 0;
-        pointer-events: none;
-      }
-      .input-style {
-        width: 100%;
-        background: #f3f4f6;
-        border: none;
-        border-radius: 12px;
-        padding: 12px;
-        font-size: 0.95rem;
-        margin-bottom: 15px;
-        outline: none;
-      }
-      .view-label {
-        font-size: 0.7rem;
-        font-weight: bold;
-        color: #bbb;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-        display: block;
-      }
-      .map-btn {
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        border: 1px solid #c8e6c9;
-      }
+      
+      .input-style { width: 100%; background: #f3f4f6; border: none; border-radius: 12px; padding: 12px; font-size: 0.95rem; margin-bottom: 12px; outline: none; }
+      .shop-fab { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: #ff69b4; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(255,105,180,0.4); z-index: 900; }
     </style>
   </head>
-  <body class="p-5">
-    <header class="flex justify-between items-start mb-6">
-      <div>
+  <body>
+    <header class="p-5 pb-2">
+      <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold text-pink-600">🌸 東京櫻花 2026</h1>
-        <p class="text-xs text-pink-400">Word 資料同步版 v6.0</p>
+        <button onclick="toggleJSON()" class="text-xs bg-white border border-pink-200 px-3 py-1 rounded-full text-pink-400">備份/同步</button>
       </div>
-      <div class="flex flex-col gap-2 text-right">
-        <button
-          onclick="toggleJSON()"
-          class="bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm"
-        >
-          備份/同步
-        </button>
-      </div>
+      <div id="dayNav" class="day-nav"></div>
     </header>
 
-    <div id="app"></div>
+    <main id="app" class="px-5"></main>
 
-    <div id="viewPopup" class="popup-bg" onclick="closePopups()">
-      <div class="popup-content pb-10" onclick="event.stopPropagation()">
-        <div class="relative">
-          <img id="vImg" src="" class="popup-header-img" onerror="this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800'"/>
-          <div class="img-overlay"></div>
-          <div class="absolute bottom-4 left-6 right-6 flex justify-between items-end">
-            <div>
-              <h2 id="vTitle" class="text-2xl font-bold text-white shadow-lg"></h2>
-            </div>
-            <a id="vMapLink" href="#" target="_blank" class="bg-white text-green-600 px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2">
-              <i class="fas fa-map-marked-alt"></i> 查看地圖
-            </a>
-          </div>
-        </div>
-        <div class="p-6 space-y-5">
-          <div class="flex items-center gap-4">
-            <div class="flex-1 border-r border-gray-100">
-              <p class="view-label">⏰ 預計時間</p>
-              <p id="vTime" class="text-lg font-bold text-pink-600"></p>
-            </div>
-            <div class="flex-1 pl-4">
-              <p class="view-label">🎨 分類</p>
-              <p id="vTypeDisp" class="text-lg font-medium text-gray-500"></p>
-            </div>
-          </div>
-          <div>
-            <p class="view-label">📜 介紹/備註</p>
-            <p id="vDesc" class="text-gray-600 leading-relaxed text-sm"></p>
-          </div>
-          <div id="vPersonalBox" class="bg-blue-50 p-4 rounded-2xl">
-            <p class="view-label text-blue-300">💡 個人備註 (來自 Word)</p>
-            <p id="vPersonal" class="text-blue-800 italic text-sm"></p>
-          </div>
-          <button onclick="closePopups()" class="w-full mt-4 bg-gray-800 text-white py-4 rounded-2xl font-bold">關閉</button>
-        </div>
-      </div>
-    </div>
+    <div class="shop-fab" onclick="toggleShop()"><i class="fas fa-shopping-basket"></i></div>
 
     <div id="editPopup" class="popup-bg" onclick="closePopups()">
       <div class="popup-content p-6" onclick="event.stopPropagation()">
         <h2 class="text-xl font-bold mb-4">編輯行程</h2>
-        <label class="view-label">🖼️ 圖片網址</label>
-        <input type="text" id="eImg" class="input-style" placeholder="貼上網址"/>
-        <label class="view-label">🗺️ Google Map 連結</label>
-        <input type="text" id="eMap" class="input-style" placeholder="http://googleusercontent.com/maps.google.com/..."/>
-        <label class="view-label">📍 名稱</label>
-        <input type="text" id="eTitle" class="input-style font-bold" />
-        <div class="flex gap-3">
-          <div class="flex-1">
-            <label class="view-label">⏰ 時間</label>
-            <input type="text" id="eTime" class="input-style" />
-          </div>
-          <div class="flex-1">
-            <label class="view-label">🎨 分類</label>
-            <select id="eType" class="input-style">
-              <option value="spot">🏛️ 景點</option>
-              <option value="restaurant">🍴 餐廳</option>
-              <option value="transport">🚗 交通</option>
-            </select>
-          </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-[10px] font-bold text-gray-400">⏰ 時間</label><input type="text" id="eTime" class="input-style" /></div>
+            <div><label class="text-[10px] font-bold text-gray-400">💰 預算 (TWD)</label><input type="number" id="eBudget" class="input-style" /></div>
         </div>
-        <label class="view-label">📜 介紹</label>
-        <textarea id="eDesc" class="input-style h-16"></textarea>
-        <label class="view-label">💡 個人備註</label>
-        <textarea id="ePersonal" class="input-style h-16"></textarea>
-        <button onclick="saveChanges()" class="w-full bg-pink-500 text-white py-4 rounded-2xl font-bold">儲存</button>
+        <label class="text-[10px] font-bold text-gray-400">📍 名稱</label><input type="text" id="eTitle" class="input-style font-bold" />
+        <label class="text-[10px] font-bold text-gray-400">🗺️ 地圖連結</label><input type="text" id="eMap" class="input-style" />
+        <label class="text-[10px] font-bold text-gray-400">🎨 分類</label>
+        <select id="eType" class="input-style">
+          <option value="spot">🏛️ 景點</option>
+          <option value="restaurant">🍴 餐廳</option>
+          <option value="transport">🚗 交通</option>
+        </select>
+        <label class="text-[10px] font-bold text-gray-400">💡 備註</label>
+        <textarea id="ePersonal" class="input-style h-20"></textarea>
+        <button onclick="saveChanges()" class="w-full bg-pink-500 text-white py-4 rounded-2xl font-bold">更新行程</button>
       </div>
+    </div>
+
+    <div id="shopPopup" class="popup-bg" onclick="toggleShop()">
+        <div class="popup-content p-6 pb-10" onclick="event.stopPropagation()">
+            <h2 class="text-xl font-bold mb-4 flex justify-between">🛍️ 購物清單 <span class="text-sm font-normal text-gray-400" onclick="clearBought()">清除已買</span></h2>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="newShopItem" class="input-style mb-0" placeholder="想買什麼？">
+                <button onclick="addShopItem()" class="bg-pink-500 text-white px-4 rounded-xl">新增</button>
+            </div>
+            <div id="shopList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+            <button onclick="toggleShop()" class="w-full mt-6 bg-gray-100 py-3 rounded-xl font-bold">關閉</button>
+        </div>
     </div>
 
     <div id="jsonPopup" class="popup-bg" onclick="toggleJSON()">
       <div class="popup-content p-6" onclick="event.stopPropagation()">
-        <h2 class="text-xl font-bold mb-4">數據管理</h2>
-        <textarea id="jsonInput" class="w-full h-80 border p-3 text-[10px] font-mono bg-gray-50 rounded-lg mb-4"></textarea>
-        <button onclick="importData()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold">更新數據</button>
+        <h2 class="text-xl font-bold mb-4">數據同步</h2>
+        <textarea id="jsonInput" class="w-full h-64 border p-3 text-[10px] font-mono bg-gray-50 rounded-lg mb-4"></textarea>
+        <button onclick="importData()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold">更新所有數據</button>
       </div>
     </div>
 
     <script>
+      let currentDayIdx = 0;
       let editingIndices = { d: 0, i: 0 };
       const iconMap = { spot: "🏛️", restaurant: "🍴", transport: "🚗" };
-      const typeLabel = { spot: "景點", restaurant: "餐廳", transport: "交通" };
 
-      const tripDataTemplate = [
-        {
-          day: 1,
-          date: "2026-03-14",
-          items: [
-            { time: "11:00", type: "transport", title: "抵達羽田機場", map: "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E7%BE%BD%E7%94%B0%E6%A9%9F%E5%A0%B4)/@35.5477009,139.7684885,15z/data=!3m1!4b1!4m6!3m5!1s0x6018640ba43192e3:0xd32c3a9d146f8df!8m2!3d35.5482964!4d139.7779951!16zL20vMDFubG1t?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "抵達東京。", personal: "" },
-            { time: "15:00", type: "spot", title: "入住 HOTEL CLAD", map: "https://www.google.com/maps?cid=7316536174472237467", img: "", desc: "搭乘巴士前往。", personal: "位於御殿場。" },
-            { time: "16:00", type: "spot", title: "御殿場 Outlet", map: "https://www.google.com/maps?cid=5814346422745768836", img: "", desc: "步行前往。", personal: "" }
-          ]
-        },
-        {
-          day: 2,
-          date: "2026-03-15",
-          items: [
-            { time: "09:00", type: "transport", title: "Toyota Rent a Car (租車)", map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "搭乘計程車前往。", personal: "" },
-            { time: "10:30", type: "spot", title: "山中湖 - 平野之濱", map: "https://www.google.com/maps/place/%E5%B9%B3%E9%87%8E%E4%B9%8B%E6%BF%B1/@35.4247045,138.8982488,17z/data=!3m1!4b1!4m6!3m5!1s0x60196fec8ed01c37:0xaea15f41d50a234a!8m2!3d35.4247002!4d138.9008237!16s%2Fg%2F11nn1rs839?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "開車前往。", personal: "" },
-            { time: "11:30", type: "restaurant", title: "THE PARK 鬆餅 / 親水公園", map: "https://www.google.com/maps/place/%E9%95%B7%E6%B1%A0%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92+%E8%A5%BF%E4%B9%97%E7%94%A8%E8%BB%8A%E9%A7%90%E8%BB%8A%E5%A0%B4+(%E5%A4%A7%E5%B9%B3%E5%B1%B1%E3%83%BB%E7%9F%B3%E5%89%B2%E5%B1%B1+%E7%99%BB%E5%B1%B1%E5%8F%A3)/@35.4270612,138.8700507,18z/data=!4m6!3m5!1s0x601965939af46db3:0x7b015c3a03ce0fa!8m2!3d35.4271623!4d138.870261!16s%2Fg%2F11qn5wkdq3?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "步行。", personal: "" },
-            { time: "13:00", type: "spot", title: "日川時計店", map: "https://www.google.com/maps/place/Fujiyoshida+Shiei+Honmachidori+Parking+Lot/@35.4923866,138.8019421,17z/data=!4m10!1m2!2m1!1z5YGc6LuK5aC0!3m6!1s0x601967343b160537:0xdbcf1faff554a9d5!8m2!3d35.4923145!4d138.80383!15sCgnlgZzou4rloLRaCyIJ5YGc6LuK5aC0kgELcGFya2luZ19sb3SaASRDaGREU1VoTk1HOW5TMFZKUTBGblNVUm9PV1kyYUMxUlJSQULgAQD6AQQIERAj!16s%2Fg%2F11crzw0qr2?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "富士吉田街道拍攝點。", personal: "" },
-            { time: "14:30", type: "spot", title: "河口湖全景纜車", map: "https://www.google.com/maps/place/%E7%9C%8C%E5%96%B6+%E8%88%B9%E6%B4%A5%E6%B5%9C%E7%84%A1%E6%96%99%E9%A7%90%E8%BB%8A%E5%A0%B4/@35.5043743,138.769815,17.51z/data=!4m6!3m5!1s0x60195f0009dfb145:0x4a1fc0c03929b784!8m2!3d35.5038883!4d138.7701851!16s%2Fg%2F11lp2vkphz?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "搭乘纜車欣賞湖景。", personal: "" },
-            { time: "16:00", type: "spot", title: "Lawson 河口湖站前店", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway6", img: "", desc: "熱門超商打卡點。", personal: "" },
-            { time: "17:30", type: "restaurant", title: "ほうとう不動 河口湖北本店", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway7", img: "", desc: "河口湖名產餺飥麵。", personal: "" },
-            { time: "19:00", type: "spot", title: "大石公園", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway8", img: "", desc: "湖畔美景。", personal: "" },
-            { time: "20:00", type: "spot", title: "MaxValu 御殿場東田中店", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway9", img: "", desc: "超市採買。", personal: "" },
-            { time: "21:30", type: "transport", title: "Toyota 還車 / 回飯店", map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "結束自駕行程，返回 HOTEL CLAD。", personal: "" }
-          ]
-        },
-        {
-          day: 3,
-          date: "2026-03-16",
-          items: [
-            { time: "09:30", type: "transport", title: "飯店 Checkout", map: "https://www.google.com/maps?cid=7316536174472237467", img: "", desc: "離開 HOTEL CLAD。", personal: "" },
-            { time: "10:00", type: "spot", title: "御殿場 Outlet (含午餐)", map: "https://www.google.com/maps?cid=5814346422745768836", img: "", desc: "午餐在裡面吃。", personal: "" },
-            { time: "17:30", type: "transport", title: "AirBnB 民宿 Check-in", map: "https://www.google.com/maps/place/Daffitto%E6%8A%BC%E4%B8%8AI/@35.7105612,139.8061448,16.3z/data=!4m6!3m5!1s0x60188f004bd5864f:0x7d63e7887305d08e!8m2!3d35.7144156!4d139.8069057!16s%2Fg%2F11y02lrr1b?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "搭乘巴士抵達。", personal: "" },
-            { time: "18:30", type: "restaurant", title: "晚餐 - 淺草", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station0", img: "", desc: "淺草區用餐。", personal: "" },
-            { time: "19:30", type: "spot", title: "雷門", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station1", img: "", desc: "夜巡雷門。", personal: "" },
-            { time: "21:00", type: "spot", title: "LIFE 押上駅前店", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station2", img: "", desc: "24:00 關門。", personal: "買麵包當明天早餐。" }
-          ]
-        },
-        {
-          day: 4,
-          date: "2026-03-17",
-          items: [
-            { time: "10:00", type: "spot", title: "東京迪士尼", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station3", img: "", desc: "搭乘地鐵前往。", personal: "午餐人均：$500 TWD。" },
-            { time: "20:00", type: "restaurant", title: "銀座 篝 大手町店", map: "https://www.google.com/maps/place/%E9%8A%80%E5%BA%A7+%E7%AF%9D+%E5%A4%A7%E6%89%8B%E7%94%BA%E5%BA%97/@35.6884692,139.7645297,17z/data=!3m2!4b1!5s0x60188b863eb82967:0xfb353771169d1f88!4m6!3m5!1s0x60188c065b3f31e9:0xb1787c87de002442!8m2!3d35.6884692!4d139.7645297!16s%2Fg%2F11bzypbmqn?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "米其林雞白湯拉麵。", personal: "人均：$300 TWD。" }
-          ]
-        },
-        {
-          day: 5,
-          date: "2026-03-18",
-          items: [
-            { time: "11:30", type: "restaurant", title: "人形町今半 銀座店", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station4", img: "", desc: "頂級壽喜燒。", personal: "人均：$2000 TWD。" },
-            { time: "13:30", type: "spot", title: "東京鐵塔", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station5", img: "", desc: "經典地標。", personal: "" },
-            { time: "15:00", type: "spot", title: "高輪 GATEWAY CITY", map: "https://www.google.com/maps?cid=14394245430464429321", img: "", desc: "新開發特區。", personal: "" },
-            { time: "16:00", type: "spot", title: "New Balance 銀座店", map: "https://www.google.com/maps/place/New+Balance+%E9%8A%80%E5%BA%A7%E5%BA%97/@35.6703834,139.7624117,15.5z/data=!3m1!5s0x60188be131dc9a0f:0xb8a9de7a3285bc3f!4m10!1m2!2m1!1snew+balance!3m6!1s0x60188be131855555:0x42d59ea1e2bfa0a6!8m2!3d35.6713729!4d139.7682031!15sCgtuZXcgYmFsYW5jZSIDiAEBWg0iC25ldyBiYWxhbmNlkgEUc3BvcnRpbmdfZ29vZHNfc3RvcmXgAQA!16s%2Fg%2F11dfjddm9z?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "運動鞋採買。", personal: "" },
-            { time: "17:00", type: "restaurant", title: "GINZA TONKATSU SAITO 豬排", map: "https://www.google.com/maps?cid=13172906255984762323", img: "", desc: "人均：$700 TWD。", personal: "" },
-            { time: "20:00", type: "spot", title: "Uniqlo 銀座旗艦店", map: "https://www.google.com/maps/place/Uniqlo+Ginza+Flagship+Store/@35.6669282,139.7571135,15.5z/data=!3m1!5s0x60188be616e4127b:0xb343ddf465dffb5!4m10!1m2!2m1!1suniqlo!3m6!1s0x60188be66e07d36f:0x45e536859ebe18d3!8m2!3d35.6702448!4d139.7634686!15sCgZ1bmlxbG8iA4gBAVoIIgZ1bmlxbG-SAQ5jbG90aGVzX21hcmtldOABAA!16s%2Fg%2F1th8736p?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "全球最大旗艦店。", personal: "" }
-          ]
-        },
-        {
-          day: 6,
-          date: "2026-03-19",
-          items: [
-            { time: "11:30", type: "restaurant", title: "Sweet Check", map: "https://www.google.com/maps/place/Sweet+Check/@35.6648961,139.7136236,14z/data=!4m18!1m9!3m8!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!2sSweet+Check!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f!3m7!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "甜點下午茶。", personal: "人均：$500 TWD。" },
-            { time: "13:00", type: "spot", title: "niko and ... TOKYO", map: "https://www.google.com/maps/place/niko+and+...+TOKYO/@35.666114,139.7033371,17.96z/data=!3m1!5s0x60188ca430fb2c05:0x4199e9589da31cc7!4m6!3m5!1s0x60188ca69da70001:0x39738a0debb677bf!8m2!3d35.6665838!4d139.7044202!16s%2Fg%2F11b6s66b8q?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "原宿生活雜貨。", personal: "" },
-            { time: "14:00", type: "restaurant", title: "Kenyan Shibuya (奶茶)", map: "https://www.google.com/maps/place/Kenyan+Shibuya/@35.6638151,139.6999153,17z/data=!3m1!4b1!4m6!3m5!1s0x60188ca8ca4ae3b3:0x11a910c14454ccbc!8m2!3d35.6638151!4d139.6999153!16s%2Fg%2F1tg50dyd?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "艾利奶茶。", personal: "" },
-            { time: "15:00", type: "spot", title: "FREAK'S STORE Shibuya", map: "https://www.google.com/maps/place/FREAK'S+STORE+Shibuya/@35.6628882,139.7002868,21z/data=!3m1!5s0x60188ca896754d61:0xb69bf0e2782ee24a!4m6!3m5!1s0x60188ca895c73753:0xb4a267f60a5cbca4!8m2!3d35.6629562!4d139.7004055!16s%2Fg%2F1tnpk_c_?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "服飾品牌店。", personal: "" },
-            { time: "16:00", type: "spot", title: "澀谷 SKY", map: "https://www.google.com/maps?cid=8067212359343678579", img: "", desc: "高空展望台。", personal: "" }
-          ]
-        },
-        {
-          day: 7,
-          date: "2026-03-20",
-          items: [
-            { time: "10:00", type: "spot", title: "玩具店 Yamashiroya", map: "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/@35.7113323,139.7727318,17z/data=!3m1!4b1!4m6!3m5!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1!8m2!3d35.711328!4d139.7753067!16s%2Fg%2F11b6_p_q71?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "上野站前玩具大樓。", personal: "" },
-            { time: "11:00", type: "spot", title: "上野恩賜公園", map: "https://www.google.com/maps/place/%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92/@35.7146853,139.769852,16.25z/data=!4m6!3m5!1s0x60188e9b45906ac3:0xb1cb3623124e645a!8m2!3d35.7147557!4d139.7734312!16zL20vMDJ5NWdk?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "看櫻花。", personal: "" },
-            { time: "15:00", type: "restaurant", title: "藏前 ASAGE CAFE", map: "https://www.google.com/maps/place/ASAGE+CAFE-%E3%82%AB%E3%83%AF%E3%83%89%E3%82%B3CAFE+%26+BAR-+%E6%B5%85%E8%8D%89%E8%94%B5%E5%89%8D/@35.7066728,139.7929265,16.21z/data=!4m6!3m5!1s0x60188fb68745fa1d:0x81f194fd425d1bdf!8m2!3d35.7052553!4d139.7946272!16s%2Fg%2F11s_vxwr4x?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "淺草藏前河畔咖啡。", personal: "" },
-            { time: "16:00", type: "spot", title: "藏前逛逛 (可麗露/神社)", map: "https://www.google.com/maps/place/Mizukiya+Baba+Shoten/@35.7027365,139.7896724,17z/data=!3m1!4b1!4m6!3m5!1s0x60188eb718fd3b7b:0x6a70a51c798a02d1!8m2!3d35.7027365!4d139.7896724!16s%2Fg%2F11b6ns6dmh?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", img: "", desc: "Mizukiya Baba Shoten、KURAMAE CANNELE、藏前神社。", personal: "" }
-          ]
-        }
+      let tripData = [
+        { day: 1, date: "2026-03-14", items: [
+            { time: "11:00", type: "transport", title: "抵達羽田機場", map: "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E7%BE%BD%E7%94%B0%E6%A9%9F%E5%A0%B4)/@35.5477009,139.7684885,15z/data=!3m1!4b1!4m6!3m5!1s0x6018640ba43192e3:0xd32c3a9d146f8df!8m2!3d35.5482964!4d139.7779951!16zL20vMDFubG1t?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "抵達東京。" },
+            { time: "15:00", type: "spot", title: "入住 HOTEL CLAD", map: "https://www.google.com/maps?cid=7316536174472237467", budget: 0, personal: "位於御殿場，搭乘巴士。" },
+            { time: "16:00", type: "spot", title: "御殿場 Outlet", map: "https://www.google.com/maps?cid=5814346422745768836", budget: 0, personal: "步行前往。" }
+        ]},
+        { day: 2, date: "2026-03-15", items: [
+            { time: "09:00", type: "transport", title: "Toyota Rent a Car (租車)", map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 1500, personal: "搭乘計程車前往。" },
+            { time: "10:30", type: "spot", title: "山中湖 - 平野之濱", map: "https://www.google.com/maps/place/%E5%B9%B3%E9%87%8E%E4%B9%8B%E6%BF%B1/@35.4247045,138.8982488,17z/data=!3m1!4b1!4m6!3m5!1s0x60196fec8ed01c37:0xaea15f41d50a234a!8m2!3d35.4247002!4d138.9008237!16s%2Fg%2F11nn1rs839?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "開車前往。" },
+            { time: "11:30", type: "restaurant", title: "THE PARK 鬆餅 / 親水公園", map: "https://www.google.com/maps/place/%E9%95%B7%E6%B1%A0%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92+%E8%A5%BF%E4%B9%97%E7%94%A8%E8%BB%8A%E9%A7%90%E8%BB%8A%E5%A0%B4+(%E5%A4%A7%E5%B9%B3%E5%B1%B1%E3%83%BB%E7%9F%B3%E5%89%B2%E5%B1%B1+%E7%99%BB%E5%B1%B1%E5%8F%A3)/@35.4270612,138.8700507,18z/data=!4m6!3m5!1s0x601965939af46db3:0x7b015c3a03ce0fa!8m2!3d35.4271623!4d138.870261!16s%2Fg%2F11qn5wkdq3?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 450, personal: "步行。" },
+            { time: "13:00", type: "spot", title: "日川時計店", map: "https://www.google.com/maps/place/Fujiyoshida+Shiei+Honmachidori+Parking+Lot/@35.4923866,138.8019421,17z/data=!4m10!1m2!2m1!1z5YGc6LuK5aC0!3m6!1s0x601967343b160537:0xdbcf1faff554a9d5!8m2!3d35.4923145!4d138.80383!15sCgnlgZzou4rloLRaCyIJ5YGc6LuK5aC0kgELcGFya2luZ19sb3SaASRDaGREU1VoTk1HOW5TMFZKUTBGblNVUm9PV1kyYUMxUlJSQULgAQD6AQQIERAj!16s%2Fg%2F11crzw0qr2?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "富士吉田街道拍攝點。" },
+            { time: "14:30", type: "spot", title: "河口湖全景纜車", map: "https://www.google.com/maps/place/%E7%9C%8C%E5%96%B6+%E8%88%B9%E6%B4%A5%E6%B5%9C%E7%84%A1%E6%96%99%E9%A7%90%E8%BB%8A%E5%A0%B4/@35.5043743,138.769815,17.51z/data=!4m6!3m5!1s0x60195f0009dfb145:0x4a1fc0c03929b784!8m2!3d35.5038883!4d138.7701851!16s%2Fg%2F11lp2vkphz?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 200, personal: "搭乘纜車欣賞湖景。" },
+            { time: "16:00", type: "spot", title: "Lawson 河口湖站前店", map: "https://www.google.com/maps/place/%E7%BE%85%E6%A3%AE%E4%BE%BF%E5%88%A9%E5%95%86%E5%BA%97+%E6%B2%B3%E5%8F%A3%E6%B9%96%E8%BB%8A%E7%AB%99%E5%89%8D%E5%BA%97/@35.4986175,138.7290584,14z/data=!4m10!1m2!2m1!1zTGF3c29uIOays-WPo-a5luermeWJjeW6lw!3m6!1s0x60195e28296a89bf:0x611c18cefec8cb56!8m2!3d35.4986175!4d138.7671672!15sChlMYXdzb24g5rKz5Y-j5rmW56uZ5YmN5bqXIgOIAQFaHiIcbGF3c29uIOays-WPo-a5liDnq5kg5YmNIOW6l5IBEWNvbnZlbmllbmNlX3N0b3JlmgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJwV1QyVkhUbE5hVm1SWldYcEtjbFZxVW1wU2JscDNWbGhXUlUxclJSQULgAQD6AQQIDRAe!16s%2Fg%2F11b7k_0b59?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 100, personal: "熱門超商打卡點。" },
+            { time: "17:30", type: "restaurant", title: "ほうとう不動 河口湖北本店", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway7", budget: 400, personal: "河口湖名產餺飥麵。" },
+            { time: "19:00", type: "spot", title: "大石公園", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway8", budget: 0, personal: "湖畔美景。" },
+            { time: "20:00", type: "spot", title: "MaxValu 御殿場東田中店", map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway9", budget: 500, personal: "超市採買。" },
+            { time: "21:30", type: "transport", title: "Toyota 還車 / 回飯店", map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "結束自駕行程。" }
+        ]},
+        { day: 3, date: "2026-03-16", items: [
+            { time: "09:30", type: "transport", title: "飯店 Checkout", map: "https://www.google.com/maps?cid=7316536174472237467", budget: 0, personal: "離開 HOTEL CLAD。" },
+            { time: "10:00", type: "spot", title: "御殿場 Outlet (含午餐)", map: "https://www.google.com/maps?cid=5814346422745768836", budget: 3000, personal: "午餐在裡面吃。" },
+            { time: "17:30", type: "transport", title: "AirBnB 民宿 Check-in", map: "https://www.google.com/maps/place/Daffitto%E6%8A%BC%E4%B8%8AI/@35.7105612,139.8061448,16.3z/data=!4m6!3m5!1s0x60188f004bd5864f:0x7d63e7887305d08e!8m2!3d35.7144156!4d139.8069057!16s%2Fg%2F11y02lrr1b?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "搭乘巴士抵達。" },
+            { time: "18:30", type: "restaurant", title: "晚餐 - 淺草", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station0", budget: 600, personal: "淺草區用餐。" },
+            { time: "19:30", type: "spot", title: "雷門", map: "https://www.google.com/maps/place/%E6%97%A5%E6%9C%AC%E3%80%92111-0034+%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8F%B0%E6%9D%B1%E5%8D%80%E9%9B%B7%E9%96%80/@35.709848,139.7926004,17z/data=!3m1!4b1!4m6!3m5!1s0x60188ec7105f826d:0xcff40dd81843a77f!8m2!3d35.7098807!4d139.794926!16s%2Fg%2F122b8xx1?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "夜巡雷門。" },
+            { time: "21:00", type: "spot", title: "LIFE 押上駅前店", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station2", budget: 300, personal: "買麵包當明天早餐。" }
+        ]},
+        { day: 4, date: "2026-03-17", items: [
+            { time: "10:00", type: "spot", title: "東京迪士尼", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station3", budget: 2500, personal: "午餐人均：$500 TWD。" },
+            { time: "20:00", type: "restaurant", title: "銀座 篝 大手町店", map: "https://www.google.com/maps/place/%E9%8A%80%E5%BA%A7+%E7%AF%9D+%E5%A4%A7%E6%89%8B%E7%94%BA%E5%BA%97/@35.6884692,139.7645297,17z/data=!3m2!4b1!5s0x60188b863eb82967:0xfb353771169d1f88!4m6!3m5!1s0x60188c065b3f31e9:0xb1787c87de002442!8m2!3d35.6884692!4d139.7645297!16s%2Fg%2F11bzypbmqn?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 300, personal: "米其林雞白湯拉麵。" }
+        ]},
+        { day: 5, date: "2026-03-18", items: [
+            { time: "11:30", type: "restaurant", title: "人形町今半 銀座店", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station4", budget: 2000, personal: "頂級壽喜燒。" },
+            { time: "13:30", type: "spot", title: "東京鐵塔", map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station5", budget: 400, personal: "經典地標。" },
+            { time: "15:00", type: "spot", title: "高輪 GATEWAY CITY", map: "https://www.google.com/maps?cid=14394245430464429321", budget: 0, personal: "新開發特區。" },
+            { time: "16:00", type: "spot", title: "New Balance 銀座店", map: "https://www.google.com/maps/place/New+Balance+%E9%8A%80%E5%BA%A7%E5%BA%97/@35.6703834,139.7624117,15.5z/data=!3m1!5s0x60188be131dc9a0f:0xb8a9de7a3285bc3f!4m10!1m2!2m1!1snew+balance!3m6!1s0x60188be131855555:0x42d59ea1e2bfa0a6!8m2!3d35.6713729!4d139.7682031!15sCgtuZXcgYmFsYW5jZSIDiAEBWg0iC25ldyBiYWxhbmNlkgEUc3BvcnRpbmdfZ29vZHNfc3RvcmXgAQA!16s%2Fg%2F11dfjddm9z?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 3500, personal: "運動鞋採買。" },
+            { time: "17:00", type: "restaurant", title: "GINZA TONKATSU SAITO 豬排", map: "https://www.google.com/maps?cid=13172906255984762323", budget: 700, personal: "人均：$700 TWD。" },
+            { time: "20:00", type: "spot", title: "Uniqlo 銀座旗艦店", map: "https://www.google.com/maps/place/Uniqlo+Ginza+Flagship+Store/@35.6669282,139.7571135,15.5z/data=!3m1!5s0x60188be616e4127b:0xb343ddf465dffb5!4m10!1m2!2m1!1suniqlo!3m6!1s0x60188be66e07d36f:0x45e536859ebe18d3!8m2!3d35.6702448!4d139.7634686!15sCgZ1bmlxbG8iA4gBAVoIIgZ1bmlxbG-SAQ5jbG90aGVzX21hcmtldOABAA!16s%2Fg%2F1th8736p?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 2000, personal: "全球最大旗艦店。" }
+        ]},
+        { day: 6, date: "2026-03-19", items: [
+            { time: "11:30", type: "restaurant", title: "Sweet Check", map: "https://www.google.com/maps/place/Sweet+Check/@35.6648961,139.7136236,14z/data=!4m18!1m9!3m8!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!2sSweet+Check!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f!3m7!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 500, personal: "甜點下午茶。" },
+            { time: "13:00", type: "spot", title: "niko and ... TOKYO", map: "https://www.google.com/maps/place/niko+and+...+TOKYO/@35.666114,139.7033371,17.96z/data=!3m1!5s0x60188ca430fb2c05:0x4199e9589da31cc7!4m6!3m5!1s0x60188ca69da70001:0x39738a0debb677bf!8m2!3d35.6665838!4d139.7044202!16s%2Fg%2F11b6s66b8q?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 1000, personal: "原宿生活雜貨。" },
+            { time: "14:00", type: "restaurant", title: "Kenyan Shibuya (奶茶)", map: "https://www.google.com/maps/place/Kenyan+Shibuya/@35.6638151,139.6999153,17z/data=!3m1!4b1!4m6!3m5!1s0x60188ca8ca4ae3b3:0x11a910c14454ccbc!8m2!3d35.6638151!4d139.6999153!16s%2Fg%2F1tg50dyd?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 150, personal: "艾利奶茶。" },
+            { time: "15:00", type: "spot", title: "FREAK'S STORE Shibuya", map: "https://www.google.com/maps/place/FREAK'S+STORE+Shibuya/@35.6628882,139.7002868,21z/data=!3m1!5s0x60188ca896754d61:0xb69bf0e2782ee24a!4m6!3m5!1s0x60188ca895c73753:0xb4a267f60a5cbca4!8m2!3d35.6629562!4d139.7004055!16s%2Fg%2F1tnpk_c_?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 2000, personal: "服飾品牌店。" },
+            { time: "16:00", type: "spot", title: "澀谷 SKY", map: "https://www.google.com/maps?cid=8067212359343678579", budget: 600, personal: "高空展望台。" }
+        ]},
+        { day: 7, date: "2026-03-20", items: [
+            { time: "10:00", type: "spot", title: "玩具店 Yamashiroya", map: "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/@35.7113323,139.7727318,17z/data=!3m1!4b1!4m6!3m5!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1!8m2!3d35.711328!4d139.7753067!16s%2Fg%2F11b6_p_q71?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 500, personal: "上野站前玩具大樓。" },
+            { time: "11:00", type: "spot", title: "上野恩賜公園", map: "https://www.google.com/maps/place/%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92/@35.7146853,139.769852,16.25z/data=!4m6!3m5!1s0x60188e9b45906ac3:0xb1cb3623124e645a!8m2!3d35.7147557!4d139.7734312!16zL20vMDJ5NWdk?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 0, personal: "看櫻花。" },
+            { time: "15:00", type: "restaurant", title: "藏前 ASAGE CAFE", map: "https://www.google.com/maps/place/ASAGE+CAFE-%E3%82%AB%E3%83%AF%E3%83%89%E3%82%B3CAFE+%26+BAR-+%E6%B5%85%E8%8D%89%E8%94%B5%E5%89%8D/@35.7066728,139.7929265,16.21z/data=!4m6!3m5!1s0x60188fb68745fa1d:0x81f194fd425d1bdf!8m2!3d35.7052553!4d139.7946272!16s%2Fg%2F11s_vxwr4x?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 400, personal: "淺草藏前河畔咖啡。" },
+            { time: "16:00", type: "spot", title: "藏前逛逛 (可麗露/神社)", map: "https://www.google.com/maps/place/Mizukiya+Baba+Shoten/@35.7027365,139.7896724,17z/data=!3m1!4b1!4m6!3m5!1s0x60188eb718fd3b7b:0x6a70a51c798a02d1!8m2!3d35.7027365!4d139.7896724!16s%2Fg%2F11b6ns6dmh?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D", budget: 800, personal: "Mizukiya Baba Shoten、KURAMAE CANNELE。" }
+        ]}
       ];
 
-      let tripData = [];
+      let shopList = [];
 
       function renderApp() {
+        const nav = document.getElementById("dayNav");
+        nav.innerHTML = tripData.map((d, idx) => `
+          <div class="day-tab ${idx === currentDayIdx ? 'active' : ''}" onclick="currentDayIdx=${idx}; renderApp();">
+            <div class="text-[10px] text-gray-400">DAY ${d.day}</div>
+            <div class="font-bold text-pink-500">${d.date.split('-').pop()}</div>
+          </div>
+        `).join("");
+
+        const day = tripData[currentDayIdx];
+        const dayTotal = day.items.reduce((sum, item) => sum + (Number(item.budget) || 0), 0);
+        
         const container = document.getElementById("app");
-        container.innerHTML = tripData
-          .map((day, dIdx) => {
-            let cardsHtml = "";
-            day.items.forEach((item, iIdx) => {
-              cardsHtml += `
-                <div class="card card-${item.type} mb-3" onclick="openView(${dIdx}, ${iIdx})">
-                  <div class="flex justify-between items-start">
+        container.innerHTML = `
+          <div class="flex justify-between items-end mb-4">
+            <h2 class="text-xl font-bold text-gray-700">Day ${day.day} 行程</h2>
+            <div class="text-right">
+                <span class="text-[10px] text-gray-400 block">今日預估花費</span>
+                <span class="text-lg font-bold text-teal-600">NT$ ${dayTotal.toLocaleString()}</span>
+            </div>
+          </div>
+          ${day.items.map((item, iIdx) => `
+            <div class="card card-${item.type}" onclick="openEdit(${currentDayIdx}, ${iIdx})">
+                <div class="flex justify-between items-start mb-2">
                     <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-[10px] font-bold">${item.time}</span>
                     <div class="flex gap-2">
-                      ${item.map ? `<a href="${item.map}" target="_blank" onclick="event.stopPropagation()" class="map-btn"><i class="fas fa-location-arrow"></i>地圖</a>` : ""}
-                      <button class="text-gray-300 p-1" onclick="openEdit(event, ${dIdx}, ${iIdx})"><i class="fas fa-pen text-xs"></i></button>
+                        ${item.budget > 0 ? `<span class="budget-badge">NT$ ${item.budget}</span>` : ''}
+                        ${item.map ? `<a href="${item.map}" target="_blank" onclick="event.stopPropagation()" class="text-green-500"><i class="fas fa-location-dot"></i></a>` : ''}
                     </div>
-                  </div>
-                  <h3 class="text-lg font-bold mt-1 text-gray-800">${iconMap[item.type]} ${item.title}</h3>
-                  ${item.personal ? `<div class="personal-note-preview"><i class="fas fa-lightbulb mr-1"></i>${item.personal}</div>` : ""}
-                </div>`;
-            });
-            return `<div class="mb-10 day-group"><h2 class="text-xl font-bold text-pink-500 mb-4">📅 Day ${day.day} (${day.date})</h2><div>${cardsHtml}</div></div>`;
-          })
-          .join("");
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">${iconMap[item.type]} ${item.title}</h3>
+                ${item.personal ? `<p class="text-xs text-blue-500 mt-2 italic bg-blue-50 p-2 rounded-lg"><i class="fas fa-lightbulb mr-1 text-[10px]"></i>${item.personal}</p>` : ''}
+            </div>
+          `).join("")}
+        `;
         saveLocal();
       }
 
-      function openView(d, i) {
-        const item = tripData[d].items[i];
-        document.getElementById("vImg").src = item.img || "";
-        document.getElementById("vTitle").innerText = item.title;
-        document.getElementById("vTime").innerText = item.time;
-        document.getElementById("vTypeDisp").innerText = typeLabel[item.type];
-        document.getElementById("vDesc").innerText = item.desc || "";
-        document.getElementById("vPersonal").innerText = item.personal || "";
-        const mapBtn = document.getElementById("vMapLink");
-        mapBtn.href = item.map || "#";
-        mapBtn.style.display = item.map ? "flex" : "none";
-        document.getElementById("viewPopup").classList.add("active");
-      }
-
-      function openEdit(e, d, i) {
-        e.stopPropagation();
+      function openEdit(d, i) {
         editingIndices = { d, i };
         const item = tripData[d].items[i];
-        document.getElementById("eImg").value = item.img || "";
-        document.getElementById("eMap").value = item.map || "";
-        document.getElementById("eTitle").value = item.title;
         document.getElementById("eTime").value = item.time;
+        document.getElementById("eBudget").value = item.budget || 0;
+        document.getElementById("eTitle").value = item.title;
+        document.getElementById("eMap").value = item.map || "";
         document.getElementById("eType").value = item.type;
-        document.getElementById("eDesc").value = item.desc || "";
         document.getElementById("ePersonal").value = item.personal || "";
         document.getElementById("editPopup").classList.add("active");
       }
@@ -355,41 +198,53 @@
       function saveChanges() {
         const { d, i } = editingIndices;
         const item = tripData[d].items[i];
-        item.img = document.getElementById("eImg").value;
-        item.map = document.getElementById("eMap").value;
-        item.title = document.getElementById("eTitle").value;
         item.time = document.getElementById("eTime").value;
+        item.budget = Number(document.getElementById("eBudget").value);
+        item.title = document.getElementById("eTitle").value;
+        item.map = document.getElementById("eMap").value;
         item.type = document.getElementById("eType").value;
-        item.desc = document.getElementById("eDesc").value;
         item.personal = document.getElementById("ePersonal").value;
-        renderApp();
-        closePopups();
+        renderApp(); closePopups();
       }
 
-      function closePopups() {
-        document.querySelectorAll(".popup-bg").forEach((p) => p.classList.remove("active"));
+      function toggleShop() { document.getElementById("shopPopup").classList.toggle("active"); renderShop(); }
+      function addShopItem() {
+        const input = document.getElementById("newShopItem");
+        if(input.value) { shopList.push({text: input.value, bought: false}); input.value = ""; renderShop(); }
+      }
+      function toggleItem(idx) { shopList[idx].bought = !shopList[idx].bought; renderShop(); }
+      function clearBought() { shopList = shopList.filter(i => !i.bought); renderShop(); }
+      function renderShop() {
+        const list = document.getElementById("shopList");
+        list.innerHTML = shopList.map((item, idx) => `
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl" onclick="toggleItem(${idx})">
+                <i class="fa-regular ${item.bought ? 'fa-circle-check text-green-500' : 'fa-circle text-gray-300'} text-xl"></i>
+                <span class="${item.bought ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}">${item.text}</span>
+            </div>
+        `).join("");
+        saveLocal();
       }
 
-      function toggleJSON() {
-        document.getElementById("jsonInput").value = JSON.stringify(tripData, null, 2);
-        document.getElementById("jsonPopup").classList.toggle("active");
+      function closePopups() { document.querySelectorAll(".popup-bg").forEach(p => p.classList.remove("active")); }
+      function toggleJSON() { 
+        document.getElementById("jsonInput").value = JSON.stringify({tripData, shopList}, null, 2);
+        document.getElementById("jsonPopup").classList.toggle("active"); 
       }
-
       function importData() {
         try {
-          tripData = JSON.parse(document.getElementById("jsonInput").value);
-          renderApp();
-          closePopups();
-        } catch (e) { alert("JSON 格式錯誤"); }
+          const imported = JSON.parse(document.getElementById("jsonInput").value);
+          tripData = imported.tripData; shopList = imported.shopList || [];
+          renderApp(); closePopups();
+        } catch (e) { alert("格式錯誤"); }
       }
-
-      function saveLocal() {
-        localStorage.setItem("trip_data_v6_0", JSON.stringify(tripData));
-      }
+      function saveLocal() { localStorage.setItem("trip_v7_1_data", JSON.stringify({tripData, shopList})); }
 
       window.onload = () => {
-        const saved = localStorage.getItem("trip_data_v6_0");
-        tripData = saved ? JSON.parse(saved) : tripDataTemplate;
+        const saved = localStorage.getItem("trip_v7_1_data");
+        if(saved) {
+            const parsed = JSON.parse(saved);
+            tripData = parsed.tripData; shopList = parsed.shopList || [];
+        }
         renderApp();
       };
     </script>
