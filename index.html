@@ -1,667 +1,790 @@
 <!doctype html>
 <html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>東京櫻花 2026 Pro v7.1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-    <style>
-      :root {
-        --main-pink: #ffb6c1;
-        --bg-pink: #fff5f7;
-      }
-      body {
-        background-color: var(--bg-pink);
-        font-family: -apple-system, sans-serif;
-        padding-bottom: 100px;
-        color: #4a4a4a;
-        -webkit-tap-highlight-color: transparent;
-      }
 
-      .day-nav {
-        display: flex;
-        overflow-x: auto;
-        gap: 10px;
-        padding: 10px 5px;
-        scrollbar-width: none;
-      }
-      .day-nav::-webkit-scrollbar {
-        display: none;
-      }
-      .day-tab {
-        flex: 0 0 70px;
-        text-align: center;
-        padding: 10px;
-        border-radius: 15px;
-        background: white;
-        border: 2px solid transparent;
-        transition: 0.3s;
-      }
-      .day-tab.active {
-        border-color: var(--main-pink);
-        background: #ffe4e8;
-        transform: scale(1.05);
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>東京櫻花 2026 Pro v7.1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --main-pink: #ffb6c1;
+      --bg-pink: #fff5f7;
+    }
 
-      .card {
-        background: white;
-        border-radius: 18px;
-        padding: 16px;
-        border-left: 8px solid #ddd;
-        box-shadow: 0 4px 12px rgba(255, 182, 193, 0.1);
-        margin-bottom: 15px;
-        position: relative;
-      }
-      .card-spot {
-        border-left-color: var(--main-pink);
-      }
-      .card-restaurant {
-        border-left-color: #ff9800;
-      }
-      .card-transport {
-        border-left-color: #9ca3af;
-      }
+    body {
+      background-color: var(--bg-pink);
+      font-family: -apple-system, sans-serif;
+      padding-bottom: 100px;
+      color: #4a4a4a;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-      .budget-badge {
-        background: #e0f2f1;
-        color: #00796b;
-        padding: 2px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: bold;
-      }
+    .day-nav {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px 5px;
+      scrollbar-width: none;
+    }
 
-      .popup-bg {
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        align-items: end;
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-      }
-      .popup-bg.active {
-        display: flex;
-      }
-      .popup-content {
-        transform: translateY(100%);
-        transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1);
-        background: white;
-        width: 100%;
-        border-radius: 30px 30px 0 0;
-        max-height: 85vh;
-        overflow-y: auto;
-      }
-      .popup-bg.active .popup-content {
-        transform: translateY(0);
-      }
+    .day-nav::-webkit-scrollbar {
+      display: none;
+    }
 
-      .input-style {
-        width: 100%;
-        background: #f3f4f6;
-        border: none;
-        border-radius: 12px;
-        padding: 12px;
-        font-size: 0.95rem;
-        margin-bottom: 12px;
-        outline: none;
-      }
-      .shop-fab {
-        position: fixed;
-        bottom: 30px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background: #ff69b4;
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
-        z-index: 900;
-      }
-    </style>
-  </head>
-  <body>
-    <header class="p-5 pb-2">
+    .day-tab {
+      flex: 0 0 70px;
+      text-align: center;
+      padding: 10px;
+      border-radius: 15px;
+      background: white;
+      border: 2px solid transparent;
+      transition: 0.3s;
+    }
+
+    .day-tab.active {
+      border-color: var(--main-pink);
+      background: #ffe4e8;
+      transform: scale(1.05);
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      border-left: 8px solid #ddd;
+      box-shadow: 0 4px 12px rgba(255, 182, 193, 0.1);
+      margin-bottom: 15px;
+      position: relative;
+      cursor: grab;
+      transition: box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .card:active {
+      cursor: grabbing;
+    }
+
+    .card.dragging {
+      opacity: 0.4;
+      box-shadow: 0 8px 24px rgba(255, 105, 180, 0.3);
+    }
+
+    .card.drag-over {
+      box-shadow: 0 0 0 3px #ff69b4;
+    }
+
+    .card-spot {
+      border-left-color: var(--main-pink);
+    }
+
+    .card-restaurant {
+      border-left-color: #ff9800;
+    }
+
+    .card-transport {
+      border-left-color: #9ca3af;
+    }
+
+    .budget-badge {
+      background: #e0f2f1;
+      color: #00796b;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .popup-bg {
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: end;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+    }
+
+    .popup-bg.active {
+      display: flex;
+    }
+
+    .popup-content {
+      transform: translateY(100%);
+      transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1);
+      background: white;
+      width: 100%;
+      border-radius: 30px 30px 0 0;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .popup-bg.active .popup-content {
+      transform: translateY(0);
+    }
+
+    .input-style {
+      width: 100%;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .shop-fab {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #ff69b4;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+      z-index: 900;
+    }
+
+    /* view popup type stripe */
+    .view-type-stripe {
+      width: 6px;
+      border-radius: 3px;
+      min-height: 50px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="p-5 pb-2">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold text-pink-600">🌸 東京櫻花 2026</h1>
+      <button onclick="toggleJSON()"
+        class="text-xs bg-white border border-pink-200 px-3 py-1 rounded-full text-pink-400">
+        備份/同步
+      </button>
+    </div>
+    <div id="dayNav" class="day-nav"></div>
+    <div id="totalBanner" class="mt-2 mb-1 bg-white rounded-2xl px-4 py-3 flex justify-between items-center"
+      style="box-shadow:0 2px 10px rgba(255,182,193,0.18);"></div>
+  </header>
+
+  <main id="app" class="px-5"></main>
+
+  <div class="shop-fab" onclick="toggleShop()">
+    <i class="fas fa-shopping-basket"></i>
+  </div>
+
+  <!-- 檢視彈窗 -->
+  <div id="viewPopup" class="popup-bg" onclick="closePopups()">
+    <div class="popup-content p-6" onclick="event.stopPropagation()">
       <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-pink-600">🌸 東京櫻花 2026</h1>
-        <button
-          onclick="toggleJSON()"
-          class="text-xs bg-white border border-pink-200 px-3 py-1 rounded-full text-pink-400"
-        >
-          備份/同步
+        <h2 class="text-xl font-bold" id="vTitle">行程詳情</h2>
+        <button onclick="openEditFromView()"
+          class="bg-pink-100 text-pink-500 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1">
+          <i class="fas fa-pen text-xs"></i> 編輯
         </button>
       </div>
-      <div id="dayNav" class="day-nav"></div>
-    </header>
-
-    <main id="app" class="px-5"></main>
-
-    <div class="shop-fab" onclick="toggleShop()">
-      <i class="fas fa-shopping-basket"></i>
-    </div>
-
-    <div id="editPopup" class="popup-bg" onclick="closePopups()">
-      <div class="popup-content p-6" onclick="event.stopPropagation()">
-        <h2 class="text-xl font-bold mb-4">編輯行程</h2>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-[10px] font-bold text-gray-400">⏰ 時間</label
-            ><input type="text" id="eTime" class="input-style" />
+      <div class="flex gap-3 mb-4">
+        <div id="vTypeStripe" class="view-type-stripe"></div>
+        <div class="flex-1">
+          <div class="flex gap-2 mb-2 flex-wrap">
+            <span id="vTime" class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-sm font-bold"></span>
+            <span id="vType" class="bg-pink-100 text-pink-500 px-3 py-1 rounded-full text-sm font-bold"></span>
+            <span id="vBudget" class="budget-badge"></span>
           </div>
-          <div>
-            <label class="text-[10px] font-bold text-gray-400"
-              >💰 預算 (TWD)</label
-            ><input type="number" id="eBudget" class="input-style" />
-          </div>
+          <div id="vMapLink" class="mt-1"></div>
         </div>
-        <label class="text-[10px] font-bold text-gray-400">📍 名稱</label
+      </div>
+      <div id="vPersonal" class="text-sm text-blue-500 bg-blue-50 p-3 rounded-xl italic mb-4"></div>
+      <div class="flex gap-3">
+        <button onclick="deleteItem()"
+          class="flex-1 bg-red-50 text-red-400 py-3 rounded-xl font-bold border border-red-100"><i
+            class="fas fa-trash-can mr-1 text-sm"></i>刪除</button>
+        <button onclick="closePopups()" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 編輯/新增彈窗 -->
+  <div id="editPopup" class="popup-bg" onclick="closePopups()">
+    <div class="popup-content p-6" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-bold mb-4" id="editPopupTitle">編輯行程</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-[10px] font-bold text-gray-400">⏰ 時間
+            ><input type="text" id="eTime" class="input-style" placeholder="09:00" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-gray-400">💰 預算 (TWD)</label><input type="number" id="eBudget"
+            class="input-style" />
+        </div>
+      </div>
+      <label class="text-[10px] font-bold text-gray-400">📍 名稱
         ><input type="text" id="eTitle" class="input-style font-bold" />
-        <label class="text-[10px] font-bold text-gray-400">🗺️ 地圖連結</label
-        ><input type="text" id="eMap" class="input-style" />
-        <label class="text-[10px] font-bold text-gray-400">🎨 分類</label>
-        <select id="eType" class="input-style">
-          <option value="spot">🏛️ 景點</option>
-          <option value="restaurant">🍴 餐廳</option>
-          <option value="transport">🚗 交通</option>
-        </select>
-        <label class="text-[10px] font-bold text-gray-400">💡 備註</label>
-        <textarea id="ePersonal" class="input-style h-20"></textarea>
-        <button
-          onclick="saveChanges()"
-          class="w-full bg-pink-500 text-white py-4 rounded-2xl font-bold"
-        >
-          更新行程
+        <label class="text-[10px] font-bold text-gray-400">🗺️ 地圖連結
+          ><input type="text" id="eMap" class="input-style" />
+          <label class="text-[10px] font-bold text-gray-400">🎨 分類</label>
+          <select id="eType" class="input-style">
+            <option value="spot">🏛️ 景點</option>
+            <option value="restaurant">🍴 餐廳</option>
+            <option value="transport">🚗 交通</option>
+          </select>
+          <label class="text-[10px] font-bold text-gray-400">💡 備註
+            ><textarea id="ePersonal" class="input-style h-20"></textarea>
+            <button onclick="saveChanges()" class="w-full bg-pink-500 text-white py-4 rounded-2xl font-bold"
+              id="editSaveBtn">
+              更新行程
+            </button>
+    </div>
+  </div>
+
+  <div id="shopPopup" class="popup-bg" onclick="toggleShop()">
+    <div class="popup-content p-6 pb-10" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-bold mb-4 flex justify-between">
+        🛍️ 購物清單
+        <span class="text-sm font-normal text-gray-400" onclick="clearBought()">清除已買</span>
+      </h2>
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="newShopItem" class="input-style mb-0" placeholder="想買什麼？" />
+        <button onclick="addShopItem()" class="bg-pink-500 text-white px-4 rounded-xl">
+          新增
         </button>
       </div>
+      <div id="shopList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+      <button onclick="toggleShop()" class="w-full mt-6 bg-gray-100 py-3 rounded-xl font-bold">
+        關閉
+      </button>
     </div>
+  </div>
 
-    <div id="shopPopup" class="popup-bg" onclick="toggleShop()">
-      <div class="popup-content p-6 pb-10" onclick="event.stopPropagation()">
-        <h2 class="text-xl font-bold mb-4 flex justify-between">
-          🛍️ 購物清單
-          <span
-            class="text-sm font-normal text-gray-400"
-            onclick="clearBought()"
-            >清除已買</span
-          >
-        </h2>
-        <div class="flex gap-2 mb-4">
-          <input
-            type="text"
-            id="newShopItem"
-            class="input-style mb-0"
-            placeholder="想買什麼？"
-          />
-          <button
-            onclick="addShopItem()"
-            class="bg-pink-500 text-white px-4 rounded-xl"
-          >
-            新增
-          </button>
-        </div>
-        <div id="shopList" class="space-y-3 max-h-60 overflow-y-auto"></div>
-        <button
-          onclick="toggleShop()"
-          class="w-full mt-6 bg-gray-100 py-3 rounded-xl font-bold"
-        >
-          關閉
-        </button>
-      </div>
+  <div id="jsonPopup" class="popup-bg" onclick="toggleJSON()">
+    <div class="popup-content p-6" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-bold mb-4">數據同步</h2>
+      <textarea id="jsonInput"
+        class="w-full h-64 border p-3 text-[10px] font-mono bg-gray-50 rounded-lg mb-4"></textarea>
+      <button onclick="importData()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold">
+        更新所有數據
+      </button>
     </div>
+  </div>
 
-    <div id="jsonPopup" class="popup-bg" onclick="toggleJSON()">
-      <div class="popup-content p-6" onclick="event.stopPropagation()">
-        <h2 class="text-xl font-bold mb-4">數據同步</h2>
-        <textarea
-          id="jsonInput"
-          class="w-full h-64 border p-3 text-[10px] font-mono bg-gray-50 rounded-lg mb-4"
-        ></textarea>
-        <button
-          onclick="importData()"
-          class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold"
-        >
-          更新所有數據
-        </button>
-      </div>
-    </div>
+  <script>
+    const DATA_VERSION = "2026-03-07-v1"; // ← 每次更新 tripData 時，同步修改這個版本號
+    let currentDayIdx = 0;
+    let editingIndices = { d: 0, i: 0 };
+    const iconMap = { spot: "🏛️", restaurant: "🍴", transport: "🚗" };
 
-    <script>
-      let currentDayIdx = 0;
-      let editingIndices = { d: 0, i: 0 };
-      const iconMap = { spot: "🏛️", restaurant: "🍴", transport: "🚗" };
+    let tripData = [
+      {
+        "day": 1,
+        "date": "2026-03-14",
+        "items": [
+          {
+            "time": "11:00",
+            "type": "transport",
+            "title": "抵達羽田機場",
+            "map": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E7%BE%BD%E7%94%B0%E6%A9%9F%E5%A0%B4)/@35.5477009,139.7684885,15z/data=!3m1!4b1!4m6!3m5!1s0x6018640ba43192e3:0xd32c3a9d146f8df!8m2!3d35.5482964!4d139.7779951!16zL20vMDFubG1t?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "抵達東京。"
+          },
+          {
+            "time": "15:00",
+            "type": "spot",
+            "title": "入住 HOTEL CLAD",
+            "map": "https://www.google.com/maps?cid=7316536174472237467",
+            "budget": 0,
+            "personal": "位於御殿場，搭乘巴士。"
+          },
+          {
+            "time": "16:00",
+            "type": "spot",
+            "title": "御殿場 Outlet",
+            "map": "https://www.google.com/maps?cid=5814346422745768836",
+            "budget": 0,
+            "personal": "步行前往。"
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-03-15",
+        "items": [
+          {
+            "time": "09:00",
+            "type": "transport",
+            "title": "Toyota Rent a Car (租車)",
+            "map": "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 1500,
+            "personal": "搭乘計程車前往。"
+          },
+          {
+            "time": "10:30",
+            "type": "spot",
+            "title": "山中湖 - 平野之濱",
+            "map": "https://www.google.com/maps/place/%E5%B9%B3%E9%87%8E%E4%B9%8B%E6%BF%B1/@35.4247045,138.8982488,17z/data=!3m1!4b1!4m6!3m5!1s0x60196fec8ed01c37:0xaea15f41d50a234a!8m2!3d35.4247002!4d138.9008237!16s%2Fg%2F11nn1rs839?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "開車前往。"
+          },
+          {
+            "time": "11:30",
+            "type": "restaurant",
+            "title": "THE PARK 鬆餅 / 親水公園",
+            "map": "https://www.google.com/maps/place/%E9%95%B7%E6%B1%A0%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92+%E8%A5%BF%E4%B9%97%E7%94%A8%E8%BB%8A%E9%A7%90%E8%BB%8A%E5%A0%B4+(%E5%A4%A7%E5%B9%B3%E5%B1%B1%E3%83%BB%E7%9F%B3%E5%89%B2%E5%B1%B1+%E7%99%BB%E5%B1%B1%E5%8F%A3)/@35.4270612,138.8700507,18z/data=!4m6!3m5!1s0x601965939af46db3:0x7b015c3a03ce0fa!8m2!3d35.4271623!4d138.870261!16s%2Fg%2F11qn5wkdq3?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 450,
+            "personal": "步行。"
+          },
+          {
+            "time": "13:00",
+            "type": "spot",
+            "title": "日川時計店",
+            "map": "https://www.google.com/maps/place/Fujiyoshida+Shiei+Honmachidori+Parking+Lot/@35.4923866,138.8019421,17z/data=!4m10!1m2!2m1!1z5YGc6LuK5aC0!3m6!1s0x601967343b160537:0xdbcf1faff554a9d5!8m2!3d35.4923145!4d138.80383!15sCgnlgZzou4rloLRaCyIJ5YGc6LuK5aC0kgELcGFya2luZ19sb3SaASRDaGREU1VoTk1HOW5TMFZKUTBGblNVUm9PV1kyYUMxUlJSQULgAQD6AQQIERAj!16s%2Fg%2F11crzw0qr2?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "富士吉田街道拍攝點。"
+          },
+          {
+            "time": "13:30",
+            "type": "spot",
+            "title": "新倉山淺間公園",
+            "map": "https://www.google.com/maps/place/Parking+in+front+of+Arakura+Fuji+Sengen+Shrine/@35.500028,138.7998978,19.75z/data=!4m6!3m5!1s0x601967001e86c3d7:0x18758345f25f3ebe!8m2!3d35.5002829!4d138.7997594!16s%2Fg%2F11xknrdny7?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "爬山看櫻花+富士山。"
+          },
+          {
+            "time": "15:30",
+            "type": "spot",
+            "title": "Lawson 河口湖站前店",
+            "map": "https://www.google.com/maps/place/%E7%BE%85%E6%A3%AE%E4%BE%BF%E5%88%A9%E5%95%86%E5%BA%97+%E6%B2%B3%E5%8F%A3%E6%B9%96%E8%BB%8A%E7%AB%99%E5%89%8D%E5%BA%97/@35.4986175,138.7290584,14z/data=!4m10!1m2!2m1!1zTGF3c29uIOays-WPo-a5luermeWJjeW6lw!3m6!1s0x60195e28296a89bf:0x611c18cefec8cb56!8m2!3d35.4986175!4d138.7671672!15sChlMYXdzb24g5rKz5Y-j5rmW56uZ5YmN5bqXIgOIAQFaHiIcbGF3c29uIOays-WPo-a5liDnq5kg5YmNIOW6l5IBEWNvbnZlbmllbmNlX3N0b3JlmgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJwV1QyVkhUbE5hVm1SWldYcEtjbFZxVW1wU2JscDNWbGhXUlUxclJSQULgAQD6AQQIDRAe!16s%2Fg%2F11b7k_0b59?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 100,
+            "personal": "熱門超商打卡點。"
+          },
+          {
+            "time": "16:30",
+            "type": "restaurant",
+            "title": "ほうとう不動 河口湖北本店",
+            "map": "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway7",
+            "budget": 400,
+            "personal": "河口湖名產餺飥麵。"
+          },
+          {
+            "time": "18:00",
+            "type": "spot",
+            "title": "大石公園",
+            "map": "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway8",
+            "budget": 0,
+            "personal": "湖畔美景。"
+          },
+          {
+            "time": "20:00",
+            "type": "spot",
+            "title": "MaxValu 御殿場東田中店",
+            "map": "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway9",
+            "budget": 500,
+            "personal": "超市採買。"
+          },
+          {
+            "time": "21:30",
+            "type": "transport",
+            "title": "Toyota 還車 / 回飯店",
+            "map": "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "結束自駕行程。"
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2026-03-16",
+        "items": [
+          {
+            "time": "09:30",
+            "type": "transport",
+            "title": "飯店 Checkout",
+            "map": "https://www.google.com/maps?cid=7316536174472237467",
+            "budget": 0,
+            "personal": "離開 HOTEL CLAD。"
+          },
+          {
+            "time": "10:00",
+            "type": "spot",
+            "title": "御殿場 Outlet (含午餐)",
+            "map": "https://www.google.com/maps?cid=5814346422745768836",
+            "budget": 3000,
+            "personal": "午餐在裡面吃。"
+          },
+          {
+            "time": "17:00",
+            "budget": 0,
+            "title": "go to 新宿",
+            "map": "https://www.google.com/maps/place/Shinjuku+Station/@35.6951223,139.7027959,16.13z/data=!4m6!3m5!1s0x60188cd72863d9bb:0x98489d9f82b5570!8m2!3d35.6905539!4d139.6995499!16s%2Fg%2F11c1p9r7d6?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "type": "transport",
+            "personal": "搭乘巴士抵達。"
+          },
+          {
+            "time": "17:30",
+            "type": "restaurant",
+            "title": "AFURI辛紅 ",
+            "map": "https://www.google.com/maps/place/AFURI%E8%BE%9B%E7%B4%85+%E6%96%B0%E5%AE%BFSUBNADE/@35.6936184,139.7003319,17z/data=!3m1!4b1!4m6!3m5!1s0x60188def35a81a1d:0x9114a57f64cc74c0!8m2!3d35.6936184!4d139.7003319!16s%2Fg%2F11h_vxy0f4?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 300,
+            "personal": ""
+          },
+          {
+            "time": "20:00",
+            "budget": 0,
+            "title": "Alpen運動用品",
+            "map": "https://www.google.com/maps/search/Alpen/@35.6928429,139.7000505,17.12z?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": ""
+          },
+          {
+            "time": "19:00",
+            "type": "spot",
+            "title": "萬代扭蛋",
+            "map": "https://www.google.com/maps/place/Gashapon+Bandai+Official+Shop+-+Shinjuku+Marui+Annex+Store/@35.6899557,139.7024186,17.5z/data=!3m1!5s0x60188cdb5ac21103:0x37129a3c522a5742!4m10!1m2!2m1!1zR0FTSEFQT04gQkFOREFJIE9GRklDSUFMIFNIT1AgTmFtY28g5p2x5Lqs5p2x5oCl5q2M6Iie5LyO55S65aGU5bqX!3m6!1s0x60188d089e43540d:0xc117c21495d1b8ea!8m2!3d35.6901213!4d139.7060829!15sCkJHQVNIQVBPTiBCQU5EQUkgT0ZGSUNJQUwgU0hPUCBOYW1jbyDmnbHkuqzmnbHmgKXmrYzoiJ7kvI7nlLrloZTlupdaSSJHZ2FzaGFwb24gYmFuZGFpIG9mZmljaWFsIHNob3AgbmFtY28g5p2x5LqsIOadseaApSDmrYzoiJ4g5LyO55S6IOWhlCDlupeSAQl0b3lfc3RvcmWaASRDaGREU1VoTk1HOW5TMFZQV0dvd1lVUjVhVTVmTkc5UlJSQULgAQD6AQQIABAS!16s%2Fg%2F11swz4syjb?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "萬代扭蛋(新宿丸井6樓)。"
+          },
+          {
+            "time": "20:00",
+            "type": "spot",
+            "title": "BEAMS JAPAN",
+            "map": "https://www.google.com/maps/place/BEAMS+JAPAN/@35.6899315,139.6999163,17.25z/data=!3m1!5s0x60188cdb1d2c4993:0x4f9051239664716b!4m10!1m2!2m1!1zYmVhbXMgamFwYW4g5paw5a6_!3m6!1s0x60188cdb02ce6651:0xea86b34ba35eb3c5!8m2!3d35.6903982!4d139.7039897!15sChJiZWFtcyBqYXBhbiDmlrDlrr8iA4gBAVoUIhJiZWFtcyBqYXBhbiDmlrDlrr-SAQ5jbG90aGluZ19zdG9yZeABAA!16s%2Fg%2F11b6rw41sn?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": ""
+          },
+          {
+            "time": "21:00",
+            "type": "spot",
+            "title": "LIFE 押上駅前店",
+            "map": "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station2",
+            "budget": 300,
+            "personal": "買麵包當明天早餐。"
+          },
+          {
+            "time": "22:00",
+            "budget": 0,
+            "title": "回民宿",
+            "map": "https://www.google.com/maps/place/Daffitto%E6%8A%BC%E4%B8%8AI/@35.7145299,139.806874,20.17z/data=!4m6!3m5!1s0x60188f004bd5864f:0x7d63e7887305d08e!8m2!3d35.7144156!4d139.8069057!16s%2Fg%2F11y02lrr1b?authuser=0&entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": ""
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "date": "2026-03-17",
+        "items": [
+          {
+            "time": "10:00",
+            "type": "spot",
+            "title": "東京迪士尼",
+            "map": "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station3",
+            "budget": 2500,
+            "personal": "午餐人均：$500 TWD。"
+          },
+          {
+            "time": "20:00",
+            "budget": 300,
+            "title": "晚餐",
+            "map": "",
+            "type": "restaurant",
+            "personal": ""
+          },
+          {
+            "time": "21:00",
+            "type": "spot",
+            "title": "雷門",
+            "map": "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station1",
+            "budget": 0,
+            "personal": "夜巡雷門。"
+          },
+          {
+            "time": "21:30",
+            "type": "spot",
+            "title": "鳴門鯛燒本舖 淺草",
+            "map": "https://www.google.com/maps/place/%E9%B3%B4%E9%96%80%E9%AF%9B%E7%87%92%E6%9C%AC%E8%88%96+%E6%B7%BA%E8%8D%89%E6%96%B0%E4%BB%B2%E8%A6%8B%E4%B8%96%E9%80%9A%E5%BA%97/@35.6956636,139.7458716,13.91z/data=!4m10!1m2!2m1!1z6bO06ZaA6a-b54eS5pys6IiW!3m6!1s0x60188ec0c0daec91:0x44689ca179dcf47f!8m2!3d35.7121439!4d139.7947441!15sChLps7TploDpr5vnh5LmnKzoiJZaGCIW6bO06ZaAIOmvmyDnh5Ig5pysIOiIlpIBG2phcGFuZXNlX2NvbmZlY3Rpb25lcnlfc2hvcJoBJENoZERTVWhOTUc5blMwVkpRMEZuU1VOYWFuUkVRakozUlJBQuABAPoBBAgAECE!16s%2Fg%2F11c5xdhvh8?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": ""
+          }
+        ]
+      },
+      {
+        "day": 5,
+        "date": "2026-03-18",
+        "items": [
+          {
+            "time": "10:30",
+            "budget": 0,
+            "title": "小網神社",
+            "map": "https://www.google.com/maps/place/%E5%B0%8F%E7%B6%B2%E7%A5%9E%E7%A4%BE/@35.6841165,139.7778871,17z/data=!3m1!4b1!4m6!3m5!1s0x60188950f64b8f99:0xc0cb3994d27227df!8m2!3d35.6841165!4d139.780462!16s%2Fg%2F1tcz898m?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": "洗錢"
+          },
+          {
+            "time": "11:30",
+            "budget": 2000,
+            "title": "人形町今半 銀座店",
+            "map": "https://www.google.com/maps/place/%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A+%E9%8A%80%E5%BA%A7%E5%BA%97/@35.6701117,139.7602355,17z/data=!3m2!4b1!5s0x60188be61c350abb:0xb66b689826623011!4m6!3m5!1s0x60188be61dd29f29:0xb889a03eba782075!8m2!3d35.6701117!4d139.7628104!16s%2Fg%2F1w455ly9?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "restaurant",
+            "personal": "頂級壽喜燒。"
+          },
+          {
+            "time": "13:30",
+            "budget": 0,
+            "title": "東京鐵塔",
+            "map": "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station5",
+            "type": "spot",
+            "personal": "經典地標。"
+          },
+          {
+            "time": "15:00",
+            "type": "spot",
+            "title": "高輪 GATEWAY CITY",
+            "map": "https://www.google.com/maps?cid=14394245430464429321",
+            "budget": 0,
+            "personal": "新開發特區。"
+          },
+          {
+            "time": "15:00",
+            "type": "spot",
+            "title": "Kougnane no Mise甜點",
+            "map": "https://www.google.com/maps/place/Kougnane+no+Mise/@35.674509,139.7630057,16z/data=!4m6!3m5!1s0x60188b4df86c0d47:0xcd81ce78148cdcf4!8m2!3d35.6744744!4d139.7630037!16s%2Fg%2F11pdm0x454?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "。"
+          },
+          {
+            "time": "16:00",
+            "budget": 0,
+            "title": "New Balance 銀座店",
+            "map": "https://www.google.com/maps/place/New+Balance+%E9%8A%80%E5%BA%A7%E5%BA%97/@35.6703834,139.7624117,15.5z/data=!3m1!5s0x60188be131dc9a0f:0xb8a9de7a3285bc3f!4m10!1m2!2m1!1snew+balance!3m6!1s0x60188be131855555:0x42d59ea1e2bfa0a6!8m2!3d35.6713729!4d139.7682031!15sCgtuZXcgYmFsYW5jZSIDiAEBWg0iC25ldyBiYWxhbmNlkgEUc3BvcnRpbmdfZ29vZHNfc3RvcmXgAQA!16s%2Fg%2F11dfjddm9z?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": "運動鞋採買。"
+          },
+          {
+            "time": "17:00",
+            "type": "restaurant",
+            "title": "GINZA TONKATSU SAITO 豬排",
+            "map": "https://www.google.com/maps?cid=13172906255984762323",
+            "budget": 700,
+            "personal": "人均：$700 TWD。"
+          },
+          {
+            "time": "19:00",
+            "type": "spot",
+            "title": "Uniqlo 銀座旗艦店",
+            "map": "https://www.google.com/maps/place/Uniqlo+Ginza+Flagship+Store/@35.6669282,139.7571135,15.5z/data=!3m1!5s0x60188be616e4127b:0xb343ddf465dffb5!4m10!1m2!2m1!1suniqlo!3m6!1s0x60188be66e07d36f:0x45e536859ebe18d3!8m2!3d35.6702448!4d139.7634686!15sCgZ1bmlxbG8iA4gBAVoIIgZ1bmlxbG-SAQ5jbG90aGVzX21hcmtldOABAA!16s%2Fg%2F1th8736p?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 2000,
+            "personal": "全球最大旗艦店。"
+          },
+          {
+            "time": "20:00",
+            "type": "spot",
+            "title": "無印良品 銀座旗艦店",
+            "map": "https://www.google.com/maps/place/%E7%84%A1%E5%8D%B0%E8%89%AF%E5%93%81+%E9%8A%80%E5%BA%A7%E6%97%97%E8%89%A6%E5%BA%97/@35.6728396,139.764687,19.25z/data=!3m1!5s0x60188be4497e80d7:0x23149c020d4702aa!4m10!1m2!2m1!1sMUJI+GINZA!3m6!1s0x60188baa38aecf7d:0xab5a3452172b5f9!8m2!3d35.673214!4d139.7653677!15sCgpNVUpJIEdJTlpBIgOIAQFaDCIKbXVqaSBnaW56YZIBDXZhcmlldHlfc3RvcmXgAQA!16s%2Fg%2F11fk8hrrq5?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": "",
+            "personal": "。"
+          },
+          {
+            "time": "21:30",
+            "budget": 0,
+            "title": "福德神社/櫻花街道",
+            "map": "https://www.google.com/maps/place/%E7%A6%8F%E5%BE%B7%E7%A5%9E%E7%A4%BE/@35.6854207,139.7751359,17.25z/data=!3m1!5s0x60188be61c350abb:0xb66b689826623011!4m14!1m7!3m6!1s0x60188be61dd29f29:0xb889a03eba782075!2z5Lq65b2i55S65LuK5Y2KIOmKgOW6p-W6lw!8m2!3d35.6701117!4d139.7628104!16s%2Fg%2F1w455ly9!3m5!1s0x601889550bb3dbc3:0x572492f76698959d!8m2!3d35.6873073!4d139.7744491!16s%2Fg%2F1hc6vqcpk?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": ""
+          }
+        ]
+      },
+      {
+        "day": 6,
+        "date": "2026-03-19",
+        "items": [
+          {
+            "time": "10:00",
+            "budget": 0,
+            "title": "隅田公園 (淺草側)",
+            "map": "https://www.google.com/maps/place/%E9%9A%85%E7%94%B0%E5%85%AC%E5%9C%92+(%E6%B7%BA%E8%8D%89%E5%81%B4)/@35.7126721,139.7998053,17.5z/data=!4m6!3m5!1s0x60188ec349138a67:0xc95c03b0375fa0d7!8m2!3d35.7137617!4d139.8014506!16s%2Fg%2F120xzqw2?authuser=0&entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": ""
+          },
+          {
+            "time": "10:30",
+            "budget": 0,
+            "title": "八十八良葉舍",
+            "map": "https://www.google.com/maps/place/%E5%85%AB%E5%8D%81%E5%85%AB%E8%89%AF%E8%91%89%E8%88%8D+%E6%B7%BA%E8%8D%89/@35.715183,139.8015959,19.29z/data=!4m6!3m5!1s0x60188d4d2096709d:0xa3f29d92f6ae1181!8m2!3d35.7145375!4d139.8014641!16s%2Fg%2F11k4zj1jyp?authuser=0&entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "restaurant",
+            "personal": "抹茶"
+          },
+          {
+            "time": "10:00",
+            "type": "spot",
+            "title": "玩具店 Yamashiroya",
+            "map": "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/@35.7113323,139.7727318,17z/data=!3m1!4b1!4m6!3m5!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1!8m2!3d35.711328!4d139.7753067!16s%2Fg%2F11b6_p_q71?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 500,
+            "personal": "上野站前玩具大樓。"
+          },
+          {
+            "time": "11:00",
+            "type": "spot",
+            "title": "上野恩賜公園",
+            "map": "https://www.google.com/maps/place/%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92/@35.7146853,139.769852,16.25z/data=!4m6!3m5!1s0x60188e9b45906ac3:0xb1cb3623124e645a!8m2!3d35.7147557!4d139.7734312!16zL20vMDJ5NWdk?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 0,
+            "personal": "看櫻花。"
+          },
+          {
+            "time": "15:00",
+            "type": "restaurant",
+            "title": "藏前 ASAGE CAFE",
+            "map": "https://www.google.com/maps/place/ASAGE+CAFE-%E3%82%AB%E3%83%AF%E3%83%89%E3%82%B3CAFE+%26+BAR-+%E6%B5%85%E8%8D%89%E8%94%B5%E5%89%8D/@35.7066728,139.7929265,16.21z/data=!4m6!3m5!1s0x60188fb68745fa1d:0x81f194fd425d1bdf!8m2!3d35.7052553!4d139.7946272!16s%2Fg%2F11s_vxwr4x?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 400,
+            "personal": "淺草藏前河畔咖啡。"
+          },
+          {
+            "time": "16:00",
+            "type": "spot",
+            "title": "藏前逛逛 (可麗露/神社)",
+            "map": "https://www.google.com/maps/place/Mizukiya+Baba+Shoten/@35.7027365,139.7896724,17z/data=!3m1!4b1!4m6!3m5!1s0x60188eb718fd3b7b:0x6a70a51c798a02d1!8m2!3d35.7027365!4d139.7896724!16s%2Fg%2F11b6ns6dmh?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 800,
+            "personal": "Mizukiya Baba Shoten、KURAMAE CANNELE。"
+          },
+          {
+            "time": "14:00",
+            "budget": 0,
+            "title": "藏前神社",
+            "map": "https://www.google.com/maps/place/Kuramae+Shrine/@35.7050262,139.7898866,17.5z/data=!4m6!3m5!1s0x60188eb79264229d:0xc2d891bbdcff35c8!8m2!3d35.7048833!4d139.791877!16s%2Fg%2F11jxdtt2s1?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": "拍櫻花"
+          }
+        ]
+      },
+      {
+        "day": 7,
+        "date": "2026-03-20",
+        "items": [
+          {
+            "time": "11:30",
+            "type": "restaurant",
+            "title": "Sweet Check",
+            "map": "https://www.google.com/maps/place/Sweet+Check/@35.6648961,139.7136236,14z/data=!4m18!1m9!3m8!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!2sSweet+Check!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f!3m7!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 500,
+            "personal": "午餐。"
+          },
+          {
+            "time": "13:00",
+            "type": "restaurant",
+            "title": "草莓甜點FRANCAJS Omotesando Main Store",
+            "map": "https://www.google.com/maps/place/FRANCAJS+Omotesando+Main+Store/@35.6637113,139.7100059,17.29z/data=!3m1!5s0x60188b60055cea65:0x925a0df40241c71f!4m8!3m7!1s0x60188b079eb70d7b:0xdc93642f2125d8fd!8m2!3d35.6637855!4d139.71214!9m1!1b1!16s%2Fg%2F11f649zzkr?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 500,
+            "personal": "甜點下午茶。"
+          },
+          {
+            "time": "14:00",
+            "type": "spot",
+            "title": "niko and ... TOKYO",
+            "map": "https://www.google.com/maps/place/niko+and+...+TOKYO/@35.666114,139.7033371,17.96z/data=!3m1!5s0x60188ca430fb2c05:0x4199e9589da31cc7!4m6!3m5!1s0x60188ca69da70001:0x39738a0debb677bf!8m2!3d35.6665838!4d139.7044202!16s%2Fg%2F11b6s66b8q?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 1000,
+            "personal": "原宿生活雜貨。"
+          },
+          {
+            "time": "15:00",
+            "type": "restaurant",
+            "title": "Kenyan Shibuya (奶茶)",
+            "map": "https://www.google.com/maps/place/Kenyan+Shibuya/@35.6638151,139.6999153,17z/data=!3m1!4b1!4m6!3m5!1s0x60188ca8ca4ae3b3:0x11a910c14454ccbc!8m2!3d35.6638151!4d139.6999153!16s%2Fg%2F1tg50dyd?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 150,
+            "personal": "艾利奶茶。"
+          },
+          {
+            "time": "15:15",
+            "type": "spot",
+            "title": "FREAK'S STORE Shibuya",
+            "map": "https://www.google.com/maps/place/FREAK'S+STORE+Shibuya/@35.6628882,139.7002868,21z/data=!3m1!5s0x60188ca896754d61:0xb69bf0e2782ee24a!4m6!3m5!1s0x60188ca895c73753:0xb4a267f60a5cbca4!8m2!3d35.6629562!4d139.7004055!16s%2Fg%2F1tnpk_c_?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
+            "budget": 2000,
+            "personal": "服飾品牌店。"
+          },
+          {
+            "time": "15:30",
+            "budget": 0,
+            "title": "涉谷櫻花街道",
+            "map": "https://www.google.com/maps/place/%EF%BC%A7%EF%BC%86%EF%BC%A5%E3%83%93%E3%82%B8%E3%83%8D%E3%82%B9%E3%82%B9%E3%82%AF%E3%83%BC%E3%83%AB+%E6%B8%8B%E8%B0%B7%E6%A0%A1/@35.6566949,139.700742,20.5z/data=!3m1!5s0x60188b576f360bd7:0xe08c4bc94f3f7217!4m6!3m5!1s0x60188b576f513313:0xc63e2414e3a7c569!8m2!3d35.656573!4d139.700675!16s%2Fg%2F1pp2w_nyh?entry=ttu&g_ep=EgoyMDI2MDMwNC4xIKXMDSoASAFQAw%3D%3D",
+            "type": "spot",
+            "personal": ""
+          },
+          {
+            "time": "16:00",
+            "type": "spot",
+            "title": "澀谷 SKY",
+            "map": "https://www.google.com/maps?cid=8067212359343678579",
+            "budget": 600,
+            "personal": "高空展望台。"
+          },
+          {
+            "time": "18:00",
+            "budget": 1600,
+            "title": "晚餐",
+            "map": "",
+            "type": "restaurant",
+            "personal": "。"
+          }
+        ]
+      }
+    ];
+    let shopList = [];
 
-      let tripData = [
-        {
-          day: 1,
-          date: "2026-03-14",
-          items: [
-            {
-              time: "11:00",
-              type: "transport",
-              title: "抵達羽田機場",
-              map: "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E7%BE%BD%E7%94%B0%E6%A9%9F%E5%A0%B4)/@35.5477009,139.7684885,15z/data=!3m1!4b1!4m6!3m5!1s0x6018640ba43192e3:0xd32c3a9d146f8df!8m2!3d35.5482964!4d139.7779951!16zL20vMDFubG1t?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "抵達東京。",
-            },
-            {
-              time: "15:00",
-              type: "spot",
-              title: "入住 HOTEL CLAD",
-              map: "https://www.google.com/maps?cid=7316536174472237467",
-              budget: 0,
-              personal: "位於御殿場，搭乘巴士。",
-            },
-            {
-              time: "16:00",
-              type: "spot",
-              title: "御殿場 Outlet",
-              map: "https://www.google.com/maps?cid=5814346422745768836",
-              budget: 0,
-              personal: "步行前往。",
-            },
-          ],
-        },
-        {
-          day: 2,
-          date: "2026-03-15",
-          items: [
-            {
-              time: "09:00",
-              type: "transport",
-              title: "Toyota Rent a Car (租車)",
-              map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 1500,
-              personal: "搭乘計程車前往。",
-            },
-            {
-              time: "10:30",
-              type: "spot",
-              title: "山中湖 - 平野之濱",
-              map: "https://www.google.com/maps/place/%E5%B9%B3%E9%87%8E%E4%B9%8B%E6%BF%B1/@35.4247045,138.8982488,17z/data=!3m1!4b1!4m6!3m5!1s0x60196fec8ed01c37:0xaea15f41d50a234a!8m2!3d35.4247002!4d138.9008237!16s%2Fg%2F11nn1rs839?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "開車前往。",
-            },
-            {
-              time: "11:30",
-              type: "restaurant",
-              title: "THE PARK 鬆餅 / 親水公園",
-              map: "https://www.google.com/maps/place/%E9%95%B7%E6%B1%A0%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92+%E8%A5%BF%E4%B9%97%E7%94%A8%E8%BB%8A%E9%A7%90%E8%BB%8A%E5%A0%B4+(%E5%A4%A7%E5%B9%B3%E5%B1%B1%E3%83%BB%E7%9F%B3%E5%89%B2%E5%B1%B1+%E7%99%BB%E5%B1%B1%E5%8F%A3)/@35.4270612,138.8700507,18z/data=!4m6!3m5!1s0x601965939af46db3:0x7b015c3a03ce0fa!8m2!3d35.4271623!4d138.870261!16s%2Fg%2F11qn5wkdq3?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 450,
-              personal: "步行。",
-            },
-            {
-              time: "13:00",
-              type: "spot",
-              title: "日川時計店",
-              map: "https://www.google.com/maps/place/Fujiyoshida+Shiei+Honmachidori+Parking+Lot/@35.4923866,138.8019421,17z/data=!4m10!1m2!2m1!1z5YGc6LuK5aC0!3m6!1s0x601967343b160537:0xdbcf1faff554a9d5!8m2!3d35.4923145!4d138.80383!15sCgnlgZzou4rloLRaCyIJ5YGc6LuK5aC0kgELcGFya2luZ19sb3SaASRDaGREU1VoTk1HOW5TMFZKUTBGblNVUm9PV1kyYUMxUlJSQULgAQD6AQQIERAj!16s%2Fg%2F11crzw0qr2?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "富士吉田街道拍攝點。",
-            },
-            {
-              time: "13:30",
-              type: "spot",
-              title: "新倉山淺間公園",
-              map: "https://www.google.com/maps/place/Parking+in+front+of+Arakura+Fuji+Sengen+Shrine/@35.500028,138.7998978,19.75z/data=!4m6!3m5!1s0x601967001e86c3d7:0x18758345f25f3ebe!8m2!3d35.5002829!4d138.7997594!16s%2Fg%2F11xknrdny7?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "爬山看櫻花+富士山。",
-            },
-            {
-              time: "15:30",
-              type: "spot",
-              title: "Lawson 河口湖站前店",
-              map: "https://www.google.com/maps/place/%E7%BE%85%E6%A3%AE%E4%BE%BF%E5%88%A9%E5%95%86%E5%BA%97+%E6%B2%B3%E5%8F%A3%E6%B9%96%E8%BB%8A%E7%AB%99%E5%89%8D%E5%BA%97/@35.4986175,138.7290584,14z/data=!4m10!1m2!2m1!1zTGF3c29uIOays-WPo-a5luermeWJjeW6lw!3m6!1s0x60195e28296a89bf:0x611c18cefec8cb56!8m2!3d35.4986175!4d138.7671672!15sChlMYXdzb24g5rKz5Y-j5rmW56uZ5YmN5bqXIgOIAQFaHiIcbGF3c29uIOays-WPo-a5liDnq5kg5YmNIOW6l5IBEWNvbnZlbmllbmNlX3N0b3JlmgFEQ2k5RFFVbFJRVU52WkVOb2RIbGpSamx2VDJwV1QyVkhUbE5hVm1SWldYcEtjbFZxVW1wU2JscDNWbGhXUlUxclJSQULgAQD6AQQIDRAe!16s%2Fg%2F11b7k_0b59?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 100,
-              personal: "熱門超商打卡點。",
-            },
-            {
-              time: "16:30",
-              type: "restaurant",
-              title: "ほうとう不動 河口湖北本店",
-              map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway7",
-              budget: 400,
-              personal: "河口湖名產餺飥麵。",
-            },
-            {
-              time: "18:00",
-              type: "spot",
-              title: "大石公園",
-              map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway8",
-              budget: 0,
-              personal: "湖畔美景。",
-            },
-            {
-              time: "20:00",
-              type: "spot",
-              title: "MaxValu 御殿場東田中店",
-              map: "https://www.google.com/maps/search/Mt.+Fuji+Panoramic+Ropeway9",
-              budget: 500,
-              personal: "超市採買。",
-            },
-            {
-              time: "21:30",
-              type: "transport",
-              title: "Toyota 還車 / 回飯店",
-              map: "https://www.google.com/maps/place/Toyota+Rent+a+Car/@35.2992146,138.9327102,17z/data=!3m1!4b1!4m6!3m5!1s0x60197645ac54786f:0x10aa16a984b77dfb!8m2!3d35.2992146!4d138.9327102!16s%2Fg%2F1tfd70dc?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "結束自駕行程。",
-            },
-          ],
-        },
-        {
-          day: 3,
-          date: "2026-03-16",
-          items: [
-            {
-              time: "09:30",
-              type: "transport",
-              title: "飯店 Checkout",
-              map: "https://www.google.com/maps?cid=7316536174472237467",
-              budget: 0,
-              personal: "離開 HOTEL CLAD。",
-            },
-            {
-              time: "10:00",
-              type: "spot",
-              title: "御殿場 Outlet (含午餐)",
-              map: "https://www.google.com/maps?cid=5814346422745768836",
-              budget: 3000,
-              personal: "午餐在裡面吃。",
-            },
-            {
-              time: "17:00",
-              type: "transport",
-              title: "go to 新宿",
-              map: "https://www.google.com/maps/place/Shinjuku+Station/@35.6951223,139.7027959,16.13z/data=!4m6!3m5!1s0x60188cd72863d9bb:0x98489d9f82b5570!8m2!3d35.6905539!4d139.6995499!16s%2Fg%2F11c1p9r7d6?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "搭乘巴士抵達。",
-            },
-            {
-              time: "17:30",
-              type: "restaurant",
-              title: "AFURI辛紅 ",
-              map: "https://www.google.com/maps/place/AFURI%E8%BE%9B%E7%B4%85+%E6%96%B0%E5%AE%BFSUBNADE/@35.6936184,139.7003319,17z/data=!3m1!4b1!4m6!3m5!1s0x60188def35a81a1d:0x9114a57f64cc74c0!8m2!3d35.6936184!4d139.7003319!16s%2Fg%2F11h_vxy0f4?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 300,
-              personal: "",
-            },
-            {
-              time: "19:00",
-              type: "spot",
-              title: "萬代扭蛋",
-              map: "https://www.google.com/maps/place/Gashapon+Bandai+Official+Shop+-+Shinjuku+Marui+Annex+Store/@35.6899557,139.7024186,17.5z/data=!3m1!5s0x60188cdb5ac21103:0x37129a3c522a5742!4m10!1m2!2m1!1zR0FTSEFQT04gQkFOREFJIE9GRklDSUFMIFNIT1AgTmFtY28g5p2x5Lqs5p2x5oCl5q2M6Iie5LyO55S65aGU5bqX!3m6!1s0x60188d089e43540d:0xc117c21495d1b8ea!8m2!3d35.6901213!4d139.7060829!15sCkJHQVNIQVBPTiBCQU5EQUkgT0ZGSUNJQUwgU0hPUCBOYW1jbyDmnbHkuqzmnbHmgKXmrYzoiJ7kvI7nlLrloZTlupdaSSJHZ2FzaGFwb24gYmFuZGFpIG9mZmljaWFsIHNob3AgbmFtY28g5p2x5LqsIOadseaApSDmrYzoiJ4g5LyO55S6IOWhlCDlupeSAQl0b3lfc3RvcmWaASRDaGREU1VoTk1HOW5TMFZQV0dvd1lVUjVhVTVmTkc5UlJSQULgAQD6AQQIABAS!16s%2Fg%2F11swz4syjb?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "萬代扭蛋(新宿丸井6樓)。",
-            },
-            {
-              time: "20:00",
-              type: "spot",
-              title: "BEAMS JAPAN",
-              map: "https://www.google.com/maps/place/BEAMS+JAPAN/@35.6899315,139.6999163,17.25z/data=!3m1!5s0x60188cdb1d2c4993:0x4f9051239664716b!4m10!1m2!2m1!1zYmVhbXMgamFwYW4g5paw5a6_!3m6!1s0x60188cdb02ce6651:0xea86b34ba35eb3c5!8m2!3d35.6903982!4d139.7039897!15sChJiZWFtcyBqYXBhbiDmlrDlrr8iA4gBAVoUIhJiZWFtcyBqYXBhbiDmlrDlrr-SAQ5jbG90aGluZ19zdG9yZeABAA!16s%2Fg%2F11b6rw41sn?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "",
-            },
-            {
-              time: "21:00",
-              type: "spot",
-              title: "LIFE 押上駅前店",
-              map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station2",
-              budget: 300,
-              personal: "買麵包當明天早餐。",
-            },
-          ],
-        },
-        {
-          day: 4,
-          date: "2026-03-17",
-          items: [
-            {
-              time: "10:00",
-              type: "spot",
-              title: "東京迪士尼",
-              map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station3",
-              budget: 2500,
-              personal: "午餐人均：$500 TWD。",
-            },
-            {
-              time: "20:00",
-              type: "restaurant",
-              title: "銀座 篝 大手町店",
-              map: "https://www.google.com/maps/place/%E9%8A%80%E5%BA%A7+%E7%AF%9D+%E5%A4%A7%E6%89%8B%E7%94%BA%E5%BA%97/@35.6884692,139.7645297,17z/data=!3m2!4b1!5s0x60188b863eb82967:0xfb353771169d1f88!4m6!3m5!1s0x60188c065b3f31e9:0xb1787c87de002442!8m2!3d35.6884692!4d139.7645297!16s%2Fg%2F11bzypbmqn?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 300,
-              personal: "米其林雞白湯拉麵。",
-            },
-            {
-              time: "21:00",
-              type: "spot",
-              title: "雷門",
-              map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station1",
-              budget: 0,
-              personal: "夜巡雷門。",
-            },
-            {
-              time: "21:30",
-              type: "spot",
-              title: "鳴門鯛燒本舖 淺草",
-              map: "https://www.google.com/maps/place/%E9%B3%B4%E9%96%80%E9%AF%9B%E7%87%92%E6%9C%AC%E8%88%96+%E6%B7%BA%E8%8D%89%E6%96%B0%E4%BB%B2%E8%A6%8B%E4%B8%96%E9%80%9A%E5%BA%97/@35.6956636,139.7458716,13.91z/data=!4m10!1m2!2m1!1z6bO06ZaA6a-b54eS5pys6IiW!3m6!1s0x60188ec0c0daec91:0x44689ca179dcf47f!8m2!3d35.7121439!4d139.7947441!15sChLps7TploDpr5vnh5LmnKzoiJZaGCIW6bO06ZaAIOmvmyDnh5Ig5pysIOiIlpIBG2phcGFuZXNlX2NvbmZlY3Rpb25lcnlfc2hvcJoBJENoZERTVWhOTUc5blMwVkpRMEZuU1VOYWFuUkVRakozUlJBQuABAPoBBAgAECE!16s%2Fg%2F11c5xdhvh8?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "",
-            },
-          ],
-        },
-        {
-          day: 5,
-          date: "2026-03-18",
-          items: [
-            {
-              time: "11:30",
-              type: "restaurant",
-              title: "人形町今半 銀座店",
-              map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station4",
-              budget: 2000,
-              personal: "頂級壽喜燒。",
-            },
-            {
-              time: "13:30",
-              type: "spot",
-              title: "東京鐵塔",
-              map: "https://www.google.com/maps/search/Lawson+Kawaguchiko+Station5",
-              budget: 400,
-              personal: "經典地標。",
-            },
-            {
-              time: "15:00",
-              type: "spot",
-              title: "高輪 GATEWAY CITY",
-              map: "https://www.google.com/maps?cid=14394245430464429321",
-              budget: 0,
-              personal: "新開發特區。",
-            },
-            {
-              time: "15:00",
-              type: "spot",
-              title: "Kougnane no Mise甜點",
-              map: "https://www.google.com/maps/place/Kougnane+no+Mise/@35.674509,139.7630057,16z/data=!4m6!3m5!1s0x60188b4df86c0d47:0xcd81ce78148cdcf4!8m2!3d35.6744744!4d139.7630037!16s%2Fg%2F11pdm0x454?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "。",
-            },
-            {
-              time: "16:00",
-              type: "spot",
-              title: "New Balance 銀座店",
-              map: "https://www.google.com/maps/place/New+Balance+%E9%8A%80%E5%BA%A7%E5%BA%97/@35.6703834,139.7624117,15.5z/data=!3m1!5s0x60188be131dc9a0f:0xb8a9de7a3285bc3f!4m10!1m2!2m1!1snew+balance!3m6!1s0x60188be131855555:0x42d59ea1e2bfa0a6!8m2!3d35.6713729!4d139.7682031!15sCgtuZXcgYmFsYW5jZSIDiAEBWg0iC25ldyBiYWxhbmNlkgEUc3BvcnRpbmdfZ29vZHNfc3RvcmXgAQA!16s%2Fg%2F11dfjddm9z?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 3500,
-              personal: "運動鞋採買。",
-            },
-            {
-              time: "17:00",
-              type: "restaurant",
-              title: "GINZA TONKATSU SAITO 豬排",
-              map: "https://www.google.com/maps?cid=13172906255984762323",
-              budget: 700,
-              personal: "人均：$700 TWD。",
-            },
-            {
-              time: "19:00",
-              type: "spot",
-              title: "Uniqlo 銀座旗艦店",
-              map: "https://www.google.com/maps/place/Uniqlo+Ginza+Flagship+Store/@35.6669282,139.7571135,15.5z/data=!3m1!5s0x60188be616e4127b:0xb343ddf465dffb5!4m10!1m2!2m1!1suniqlo!3m6!1s0x60188be66e07d36f:0x45e536859ebe18d3!8m2!3d35.6702448!4d139.7634686!15sCgZ1bmlxbG8iA4gBAVoIIgZ1bmlxbG-SAQ5jbG90aGVzX21hcmtldOABAA!16s%2Fg%2F1th8736p?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 2000,
-              personal: "全球最大旗艦店。",
-            },
-            {
-              time: "20:00",
-              type: "spot",
-              title: "無印良品 銀座旗艦店",
-              map: "https://www.google.com/maps/place/%E7%84%A1%E5%8D%B0%E8%89%AF%E5%93%81+%E9%8A%80%E5%BA%A7%E6%97%97%E8%89%A6%E5%BA%97/@35.6728396,139.764687,19.25z/data=!3m1!5s0x60188be4497e80d7:0x23149c020d4702aa!4m10!1m2!2m1!1sMUJI+GINZA!3m6!1s0x60188baa38aecf7d:0xab5a3452172b5f9!8m2!3d35.673214!4d139.7653677!15sCgpNVUpJIEdJTlpBIgOIAQFaDCIKbXVqaSBnaW56YZIBDXZhcmlldHlfc3RvcmXgAQA!16s%2Fg%2F11fk8hrrq5?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: "",
-              personal: "。",
-            },
-          ],
-        },
-        {
-          day: 6,
-          date: "2026-03-19",
-          items: [
-            {
-              time: "11:30",
-              type: "restaurant",
-              title: "Sweet Check",
-              map: "https://www.google.com/maps/place/Sweet+Check/@35.6648961,139.7136236,14z/data=!4m18!1m9!3m8!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!2sSweet+Check!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f!3m7!1s0x60188b001ee3404f:0x79d3f6d78f544eb2!8m2!3d35.6648961!4d139.7136236!9m1!1b1!16s%2Fg%2F11vqzl22_f?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 500,
-              personal: "午餐。",
-            },
-            {
-              time: "13:00",
-              type: "restaurant",
-              title: "草莓甜點FRANCAJS Omotesando Main Store",
-              map: "https://www.google.com/maps/place/FRANCAJS+Omotesando+Main+Store/@35.6637113,139.7100059,17.29z/data=!3m1!5s0x60188b60055cea65:0x925a0df40241c71f!4m8!3m7!1s0x60188b079eb70d7b:0xdc93642f2125d8fd!8m2!3d35.6637855!4d139.71214!9m1!1b1!16s%2Fg%2F11f649zzkr?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 500,
-              personal: "甜點下午茶。",
-            },
-            {
-              time: "14:00",
-              type: "spot",
-              title: "niko and ... TOKYO",
-              map: "https://www.google.com/maps/place/niko+and+...+TOKYO/@35.666114,139.7033371,17.96z/data=!3m1!5s0x60188ca430fb2c05:0x4199e9589da31cc7!4m6!3m5!1s0x60188ca69da70001:0x39738a0debb677bf!8m2!3d35.6665838!4d139.7044202!16s%2Fg%2F11b6s66b8q?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 1000,
-              personal: "原宿生活雜貨。",
-            },
-            {
-              time: "15:00",
-              type: "restaurant",
-              title: "Kenyan Shibuya (奶茶)",
-              map: "https://www.google.com/maps/place/Kenyan+Shibuya/@35.6638151,139.6999153,17z/data=!3m1!4b1!4m6!3m5!1s0x60188ca8ca4ae3b3:0x11a910c14454ccbc!8m2!3d35.6638151!4d139.6999153!16s%2Fg%2F1tg50dyd?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 150,
-              personal: "艾利奶茶。",
-            },
-            {
-              time: "15:15",
-              type: "spot",
-              title: "FREAK'S STORE Shibuya",
-              map: "https://www.google.com/maps/place/FREAK'S+STORE+Shibuya/@35.6628882,139.7002868,21z/data=!3m1!5s0x60188ca896754d61:0xb69bf0e2782ee24a!4m6!3m5!1s0x60188ca895c73753:0xb4a267f60a5cbca4!8m2!3d35.6629562!4d139.7004055!16s%2Fg%2F1tnpk_c_?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 2000,
-              personal: "服飾品牌店。",
-            },
-            {
-              time: "16:00",
-              type: "spot",
-              title: "澀谷 SKY",
-              map: "https://www.google.com/maps?cid=8067212359343678579",
-              budget: 600,
-              personal: "高空展望台。",
-            },
-            {
-              time: "18:00",
-              type: "restaurant",
-              title: "晚餐-燒肉Misuzi by Yoroniku",
-              map: "https://www.google.com/maps/place/Misuzi+by+Yoroniku/@35.6747318,139.7344708,17z/data=!3m2!4b1!5s0x60188c7f533d148d:0xa6ff23b2b9ebdb57!4m6!3m5!1s0x60188c7f53173c97:0xec8797c33e41b7b5!8m2!3d35.6747275!4d139.7370457!16s%2Fg%2F1tf_11x7?authuser=0&entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 1600,
-              personal: "。",
-            },
-          ],
-        },
-        {
-          day: 7,
-          date: "2026-03-20",
-          items: [
-            {
-              time: "10:00",
-              type: "spot",
-              title: "玩具店 Yamashiroya",
-              map: "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/@35.7113323,139.7727318,17z/data=!3m1!4b1!4m6!3m5!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1!8m2!3d35.711328!4d139.7753067!16s%2Fg%2F11b6_p_q71?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 500,
-              personal: "上野站前玩具大樓。",
-            },
-            {
-              time: "11:00",
-              type: "spot",
-              title: "上野恩賜公園",
-              map: "https://www.google.com/maps/place/%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92/@35.7146853,139.769852,16.25z/data=!4m6!3m5!1s0x60188e9b45906ac3:0xb1cb3623124e645a!8m2!3d35.7147557!4d139.7734312!16zL20vMDJ5NWdk?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 0,
-              personal: "看櫻花。",
-            },
-            {
-              time: "15:00",
-              type: "restaurant",
-              title: "藏前 ASAGE CAFE",
-              map: "https://www.google.com/maps/place/ASAGE+CAFE-%E3%82%AB%E3%83%AF%E3%83%89%E3%82%B3CAFE+%26+BAR-+%E6%B5%85%E8%8D%89%E8%94%B5%E5%89%8D/@35.7066728,139.7929265,16.21z/data=!4m6!3m5!1s0x60188fb68745fa1d:0x81f194fd425d1bdf!8m2!3d35.7052553!4d139.7946272!16s%2Fg%2F11s_vxwr4x?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 400,
-              personal: "淺草藏前河畔咖啡。",
-            },
-            {
-              time: "16:00",
-              type: "spot",
-              title: "藏前逛逛 (可麗露/神社)",
-              map: "https://www.google.com/maps/place/Mizukiya+Baba+Shoten/@35.7027365,139.7896724,17z/data=!3m1!4b1!4m6!3m5!1s0x60188eb718fd3b7b:0x6a70a51c798a02d1!8m2!3d35.7027365!4d139.7896724!16s%2Fg%2F11b6ns6dmh?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D",
-              budget: 800,
-              personal: "Mizukiya Baba Shoten、KURAMAE CANNELE。",
-            },
-          ],
-        },
-      ];
-      let shopList = [];
+    let isAddingNew = false;
+    let dragSrcIdx = null;
 
-      function renderApp() {
-        const nav = document.getElementById("dayNav");
-        nav.innerHTML = tripData
-          .map(
-            (d, idx) => `
+    const typeColors = { spot: '#ffb6c1', restaurant: '#ff9800', transport: '#9ca3af' };
+    const typeLabels = { spot: '🏛️ 景點', restaurant: '🍴 餐廳', transport: '🚗 交通' };
+
+    function renderApp() {
+      const nav = document.getElementById("dayNav");
+      nav.innerHTML = tripData
+        .map(
+          (d, idx) => `
           <div class="day-tab ${idx === currentDayIdx ? "active" : ""}" onclick="currentDayIdx=${idx}; renderApp();">
             <div class="text-[10px] text-gray-400">DAY ${d.day}</div>
             <div class="font-bold text-pink-500">${d.date.split("-").pop()}</div>
           </div>
         `,
-          )
-          .join("");
+        )
+        .join("");
 
-        const day = tripData[currentDayIdx];
-        const dayTotal = day.items.reduce(
-          (sum, item) => sum + (Number(item.budget) || 0),
-          0,
-        );
+      const day = tripData[currentDayIdx];
+      const dayTotal = day.items.reduce(
+        (sum, item) => sum + (Number(item.budget) || 0),
+        0,
+      );
 
-        const container = document.getElementById("app");
-        container.innerHTML = `
+      const container = document.getElementById("app");
+      container.innerHTML = `
           <div class="flex justify-between items-end mb-4">
             <h2 class="text-xl font-bold text-gray-700">Day ${day.day} 行程</h2>
-            <div class="text-right">
+            <div class="flex items-center gap-3">
+              <div class="text-right">
                 <span class="text-[10px] text-gray-400 block">今日預估花費</span>
                 <span class="text-lg font-bold text-teal-600">NT$ ${dayTotal.toLocaleString()}</span>
+              </div>
+              <button onclick="openAdd()" class="bg-pink-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-md text-lg font-bold flex-shrink-0" style="box-shadow:0 4px 12px rgba(255,105,180,0.4);">＋</button>
             </div>
           </div>
+          <div id="cardList">
           ${day.items
-            .map(
-              (item, iIdx) => `
-            <div class="card card-${item.type}" onclick="openEdit(${currentDayIdx}, ${iIdx})">
+          .map(
+            (item, iIdx) => `
+            <div class="card card-${item.type}"
+              draggable="true"
+              data-idx="${iIdx}"
+              onclick="openView(${currentDayIdx}, ${iIdx})"
+              ondragstart="onDragStart(event, ${iIdx})"
+              ondragover="onDragOver(event)"
+              ondrop="onDrop(event, ${iIdx})"
+              ondragend="onDragEnd(event)"
+              ondragleave="onDragLeave(event)"
+            >
                 <div class="flex justify-between items-start mb-2">
                     <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-[10px] font-bold">${item.time}</span>
                     <div class="flex gap-2">
@@ -673,114 +796,249 @@
                 ${item.personal ? `<p class="text-xs text-blue-500 mt-2 italic bg-blue-50 p-2 rounded-lg"><i class="fas fa-lightbulb mr-1 text-[10px]"></i>${item.personal}</p>` : ""}
             </div>
           `,
-            )
-            .join("")}
+          )
+          .join("")}
+          </div>
         `;
-        saveLocal();
-      }
 
-      function openEdit(d, i) {
-        editingIndices = { d, i };
-        const item = tripData[d].items[i];
-        document.getElementById("eTime").value = item.time;
-        document.getElementById("eBudget").value = item.budget || 0;
-        document.getElementById("eTitle").value = item.title;
-        document.getElementById("eMap").value = item.map || "";
-        document.getElementById("eType").value = item.type;
-        document.getElementById("ePersonal").value = item.personal || "";
-        document.getElementById("editPopup").classList.add("active");
-      }
+      // 全程總花費
+      const grandTotal = tripData.reduce((sum, d) =>
+        sum + d.items.reduce((s, item) => s + (Number(item.budget) || 0), 0), 0);
+      const maxDay = Math.max(...tripData.map(d =>
+        d.items.reduce((s, item) => s + (Number(item.budget) || 0), 0)), 1);
+      document.getElementById('totalBanner').innerHTML = `
+          <div>
+            <div class="text-[10px] text-gray-400 font-bold mb-0.5">✈️ 全程預估總花費</div>
+            <div class="text-xl font-bold text-pink-600">NT$ ${grandTotal.toLocaleString()}</div>
+          </div>
+          <div class="flex gap-1 items-end h-8">
+            ${tripData.map((d, idx) => {
+        const dt = d.items.reduce((s, item) => s + (Number(item.budget) || 0), 0);
+        const h = Math.max(4, Math.round((dt / maxDay) * 28));
+        return `<div title="Day${d.day}: NT$${dt.toLocaleString()}" style="width:10px;height:${h}px;border-radius:3px;background:${idx === currentDayIdx ? '#ff69b4' : '#ffb6c1'};opacity:${idx === currentDayIdx ? 1 : 0.5};cursor:pointer" onclick="currentDayIdx=${idx};renderApp()"></div>`;
+      }).join('')}
+          </div>
+        `;
 
-      function saveChanges() {
+      saveLocal();
+    }
+
+    /* ── 拖拉排序 ── */
+    function onDragStart(e, idx) {
+      dragSrcIdx = idx;
+      setTimeout(() => e.target.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    function onDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+      e.dataTransfer.dropEffect = 'move';
+    }
+    function onDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    function onDrop(e, toIdx) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      if (dragSrcIdx === null || dragSrcIdx === toIdx) return;
+      const items = tripData[currentDayIdx].items;
+      const moved = items.splice(dragSrcIdx, 1)[0];
+      items.splice(toIdx, 0, moved);
+      dragSrcIdx = null;
+      renderApp();
+    }
+    function onDragEnd(e) {
+      e.target.classList.remove('dragging');
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('drag-over'));
+      dragSrcIdx = null;
+    }
+
+    /* ── 檢視 ── */
+    function openView(d, i) {
+      editingIndices = { d, i };
+      const item = tripData[d].items[i];
+      document.getElementById('vTitle').textContent = item.title;
+      document.getElementById('vTime').textContent = '⏰ ' + item.time;
+      document.getElementById('vType').textContent = typeLabels[item.type] || item.type;
+      document.getElementById('vTypeStripe').style.background = typeColors[item.type] || '#ddd';
+      const budgetEl = document.getElementById('vBudget');
+      if (item.budget > 0) {
+        budgetEl.textContent = 'NT$ ' + item.budget;
+        budgetEl.style.display = 'inline';
+      } else {
+        budgetEl.style.display = 'none';
+      }
+      const mapEl = document.getElementById('vMapLink');
+      if (item.map) {
+        mapEl.innerHTML = `<a href="${item.map}" target="_blank" class="text-green-500 text-sm font-bold flex items-center gap-1"><i class="fas fa-location-dot"></i> 開啟地圖</a>`;
+      } else {
+        mapEl.innerHTML = '';
+      }
+      const personalEl = document.getElementById('vPersonal');
+      if (item.personal) {
+        personalEl.textContent = item.personal;
+        personalEl.style.display = 'block';
+      } else {
+        personalEl.style.display = 'none';
+      }
+      document.getElementById('viewPopup').classList.add('active');
+    }
+
+    function openEditFromView() {
+      closePopups();
+      const { d, i } = editingIndices;
+      openEdit(d, i);
+    }
+
+    function deleteItem() {
+      const { d, i } = editingIndices;
+      const title = tripData[d].items[i].title;
+      if (!confirm(`確定要刪除「${title}」嗎？`)) return;
+      tripData[d].items.splice(i, 1);
+      renderApp();
+      closePopups();
+    }
+
+    /* ── 新增 ── */
+    function openAdd() {
+      isAddingNew = true;
+      document.getElementById('editPopupTitle').textContent = '新增行程';
+      document.getElementById('editSaveBtn').textContent = '新增行程';
+      document.getElementById('eTime').value = '';
+      document.getElementById('eBudget').value = '';
+      document.getElementById('eTitle').value = '';
+      document.getElementById('eMap').value = '';
+      document.getElementById('eType').value = 'spot';
+      document.getElementById('ePersonal').value = '';
+      document.getElementById('editPopup').classList.add('active');
+    }
+
+    /* ── 編輯 ── */
+    function openEdit(d, i) {
+      isAddingNew = false;
+      editingIndices = { d, i };
+      const item = tripData[d].items[i];
+      document.getElementById('editPopupTitle').textContent = '編輯行程';
+      document.getElementById('editSaveBtn').textContent = '更新行程';
+      document.getElementById("eTime").value = item.time;
+      document.getElementById("eBudget").value = item.budget || 0;
+      document.getElementById("eTitle").value = item.title;
+      document.getElementById("eMap").value = item.map || "";
+      document.getElementById("eType").value = item.type;
+      document.getElementById("ePersonal").value = item.personal || "";
+      document.getElementById("editPopup").classList.add("active");
+    }
+
+    function saveChanges() {
+      const time = document.getElementById("eTime").value.trim();
+      const title = document.getElementById("eTitle").value.trim();
+      if (!title) { alert('請填寫名稱'); return; }
+      const newItem = {
+        time: time,
+        budget: Number(document.getElementById("eBudget").value) || 0,
+        title: title,
+        map: document.getElementById("eMap").value.trim(),
+        type: document.getElementById("eType").value,
+        personal: document.getElementById("ePersonal").value,
+      };
+      if (isAddingNew) {
+        tripData[currentDayIdx].items.push(newItem);
+      } else {
         const { d, i } = editingIndices;
-        const item = tripData[d].items[i];
-        item.time = document.getElementById("eTime").value;
-        item.budget = Number(document.getElementById("eBudget").value);
-        item.title = document.getElementById("eTitle").value;
-        item.map = document.getElementById("eMap").value;
-        item.type = document.getElementById("eType").value;
-        item.personal = document.getElementById("ePersonal").value;
-        renderApp();
-        closePopups();
+        tripData[d].items[i] = newItem;
       }
+      renderApp();
+      closePopups();
+    }
 
-      function toggleShop() {
-        document.getElementById("shopPopup").classList.toggle("active");
+    function toggleShop() {
+      document.getElementById("shopPopup").classList.toggle("active");
+      renderShop();
+    }
+    function addShopItem() {
+      const input = document.getElementById("newShopItem");
+      if (input.value) {
+        shopList.push({ text: input.value, bought: false });
+        input.value = "";
         renderShop();
       }
-      function addShopItem() {
-        const input = document.getElementById("newShopItem");
-        if (input.value) {
-          shopList.push({ text: input.value, bought: false });
-          input.value = "";
-          renderShop();
-        }
-      }
-      function toggleItem(idx) {
-        shopList[idx].bought = !shopList[idx].bought;
-        renderShop();
-      }
-      function clearBought() {
-        shopList = shopList.filter((i) => !i.bought);
-        renderShop();
-      }
-      function renderShop() {
-        const list = document.getElementById("shopList");
-        list.innerHTML = shopList
-          .map(
-            (item, idx) => `
+    }
+    function toggleItem(idx) {
+      shopList[idx].bought = !shopList[idx].bought;
+      renderShop();
+    }
+    function clearBought() {
+      shopList = shopList.filter((i) => !i.bought);
+      renderShop();
+    }
+    function renderShop() {
+      const list = document.getElementById("shopList");
+      list.innerHTML = shopList
+        .map(
+          (item, idx) => `
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl" onclick="toggleItem(${idx})">
                 <i class="fa-regular ${item.bought ? "fa-circle-check text-green-500" : "fa-circle text-gray-300"} text-xl"></i>
                 <span class="${item.bought ? "line-through text-gray-400" : "text-gray-700 font-medium"}">${item.text}</span>
             </div>
         `,
-          )
-          .join("");
-        saveLocal();
-      }
+        )
+        .join("");
+      saveLocal();
+    }
 
-      function closePopups() {
-        document
-          .querySelectorAll(".popup-bg")
-          .forEach((p) => p.classList.remove("active"));
-      }
-      function toggleJSON() {
-        document.getElementById("jsonInput").value = JSON.stringify(
-          { tripData, shopList },
-          null,
-          2,
+    function closePopups() {
+      document
+        .querySelectorAll(".popup-bg")
+        .forEach((p) => p.classList.remove("active"));
+    }
+    function toggleJSON() {
+      document.getElementById("jsonInput").value = JSON.stringify(
+        { tripData, shopList },
+        null,
+        2,
+      );
+      document.getElementById("jsonPopup").classList.toggle("active");
+    }
+    function importData() {
+      try {
+        const imported = JSON.parse(
+          document.getElementById("jsonInput").value,
         );
-        document.getElementById("jsonPopup").classList.toggle("active");
+        tripData = imported.tripData;
+        shopList = imported.shopList || [];
+        renderApp();
+        closePopups();
+      } catch (e) {
+        alert("格式錯誤");
       }
-      function importData() {
-        try {
-          const imported = JSON.parse(
-            document.getElementById("jsonInput").value,
-          );
-          tripData = imported.tripData;
-          shopList = imported.shopList || [];
-          renderApp();
-          closePopups();
-        } catch (e) {
-          alert("格式錯誤");
-        }
-      }
-      function saveLocal() {
-        localStorage.setItem(
-          "trip_v7_1_data",
-          JSON.stringify({ tripData, shopList }),
-        );
-      }
+    }
+    function saveLocal() {
+      localStorage.setItem(
+        "trip_v7_1_data",
+        JSON.stringify({ version: DATA_VERSION, tripData, shopList }),
+      );
+    }
 
-      window.onload = () => {
-        const saved = localStorage.getItem("trip_v7_1_data");
-        if (saved) {
-          const parsed = JSON.parse(saved);
+    // 程式碼裡的 tripData 是「官方預設資料」
+    // localStorage 只在版本號相同時才使用（儲存使用者的編輯）
+    // 更新 tripData 後，記得同步修改上方的 DATA_VERSION
+    window.onload = () => {
+      const saved = localStorage.getItem("trip_v7_1_data");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.version === DATA_VERSION) {
+          // 版本相同：使用 localStorage（保留使用者的編輯）
           tripData = parsed.tripData;
           shopList = parsed.shopList || [];
+        } else {
+          // 版本不同：使用程式碼裡的新資料，清除舊快取
+          shopList = [];
+          console.log(`資料已更新：${parsed.version} → ${DATA_VERSION}`);
         }
-        renderApp();
-      };
-    </script>
-  </body>
+      }
+      renderApp();
+    };
+  </script>
+</body>
+
 </html>
